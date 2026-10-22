@@ -1,0 +1,663 @@
+{
+  "users": [
+    {
+      "id": "0490eaad-cfc4-44ea-b125-653e1922fae4",
+      "email": "testuser@example.com",
+      "password_hash": "bea0b56df776d554070459000f2800121a588a584b33a45aa8117572e0cc5c1e",
+      "full_name": "Alex Pilot",
+      "currency": "USD",
+      "is_verified": true,
+      "created_at": "2026-10-22T13:44:13.238Z",
+      "updated_at": "2026-10-22T13:44:42.409Z"
+    },
+    {
+      "id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "email": "divyaam@pocketpilot.org",
+      "password_hash": "5e4b5b752304b49e3231a3df79c73a90886cb8c4a0be78b0489840f6dec3e327",
+      "full_name": "Divyaam P",
+      "currency": "USD",
+      "is_verified": true,
+      "created_at": "2026-10-22T13:56:19.066Z",
+      "updated_at": "2026-10-22T13:56:19.091Z"
+    },
+    {
+      "id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "email": "divyaam2008@gmail.com",
+      "password_hash": "379153f50008e93cb5810059e8e1b38d38b590b6f8daaaa652bb88d0cafae44b",
+      "full_name": "Divyaam P",
+      "currency": "INR",
+      "is_verified": true,
+      "created_at": "2026-10-22T15:10:03.919Z",
+      "updated_at": "2026-10-22T15:18:16.964Z"
+    }
+  ],
+  "otp_verifications": [
+    {
+      "id": "50e8fca5-15da-4e6d-8109-b50f9679f0d0",
+      "email": "testuser@example.com",
+      "otp_code": "231655",
+      "purpose": "REGISTRATION",
+      "attempts": 1,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-22T13:44:13.238Z",
+      "expires_at": "2026-10-22T13:54:13.238Z",
+      "is_used": true,
+      "created_at": "2026-10-22T13:44:13.238Z"
+    },
+    {
+      "id": "af67384e-de2a-40b4-ad71-b71be3af8a55",
+      "email": "testuser@example.com",
+      "otp_code": "736145",
+      "purpose": "PASSWORD_RESET",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-22T13:44:36.622Z",
+      "expires_at": "2026-10-22T13:54:36.622Z",
+      "is_used": true,
+      "created_at": "2026-10-22T13:44:36.622Z"
+    },
+    {
+      "id": "b771a04d-455d-4ad0-9e19-ff2c65d54529",
+      "email": "divyaam@pocketpilot.org",
+      "otp_code": "633633",
+      "purpose": "REGISTRATION",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-22T13:56:19.066Z",
+      "expires_at": "2026-10-22T14:06:19.066Z",
+      "is_used": true,
+      "created_at": "2026-10-22T13:56:19.066Z"
+    },
+    {
+      "id": "b8f9fb09-57fa-4dee-95c0-2d9675596ef5",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "559355",
+      "purpose": "LOGIN",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-22T14:42:04.045Z",
+      "expires_at": "2026-10-22T14:52:04.046Z",
+      "is_used": true,
+      "created_at": "2026-10-22T14:42:04.045Z"
+    },
+    {
+      "id": "b733c49e-0dbb-417b-9da5-93ee03813850",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "753729",
+      "purpose": "REGISTRATION",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-22T15:10:03.919Z",
+      "expires_at": "2026-10-22T15:20:03.920Z",
+      "is_used": true,
+      "created_at": "2026-10-22T15:10:03.919Z"
+    },
+    {
+      "id": "6cdfa100-f1d6-47ed-94b3-956201334932",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "897756",
+      "purpose": "REGISTRATION",
+      "attempts": 0,
+      "resend_count": 1,
+      "last_sent_at": "2026-10-22T15:10:34.475Z",
+      "expires_at": "2026-10-22T15:20:34.475Z",
+      "is_used": false,
+      "created_at": "2026-10-22T15:10:34.475Z"
+    },
+    {
+      "id": "dd55b070-3385-4998-a8fa-e1e44a80e0e2",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "667335",
+      "purpose": "LOGIN",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-22T15:10:41.633Z",
+      "expires_at": "2026-10-22T15:20:41.633Z",
+      "is_used": true,
+      "created_at": "2026-10-22T15:10:41.633Z"
+    },
+    {
+      "id": "a5f29be7-91f5-4d6c-a87f-c42037d1c31a",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "286030",
+      "purpose": "LOGIN",
+      "attempts": 0,
+      "resend_count": 3,
+      "last_sent_at": "2026-10-22T15:18:09.782Z",
+      "expires_at": "2026-10-22T15:28:09.783Z",
+      "is_used": true,
+      "created_at": "2026-10-22T15:18:09.782Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "pp_22a3e9a87a984fed9a4c57bf9e0415d2",
+      "user_id": "0490eaad-cfc4-44ea-b125-653e1922fae4",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T13:44:45.627Z",
+      "expires_at": "2026-10-29T13:44:45.627Z"
+    },
+    {
+      "token": "pp_d13d7b878c5b42098e67c91b45ffd340",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T13:56:19.091Z",
+      "expires_at": "2026-10-29T13:56:19.091Z"
+    },
+    {
+      "token": "pp_0e29a213db884a41b34b4d113edc6884",
+      "user_id": "56c60c8c-d710-43c5-a310-430dec6bf22b",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T14:42:08.312Z",
+      "expires_at": "2026-10-29T14:42:08.312Z"
+    },
+    {
+      "token": "pp_30011e42d7a348b188741ab7e5bf48ec",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T15:10:20.452Z",
+      "expires_at": "2026-10-29T15:10:20.452Z"
+    },
+    {
+      "token": "pp_66e94e4103f84edea4f1850941bb04be",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T15:10:27.589Z",
+      "expires_at": "2026-10-29T15:10:27.589Z"
+    },
+    {
+      "token": "pp_fa9b3a0b97be413592342d5c970616dd",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T15:10:50.521Z",
+      "expires_at": "2026-10-29T15:10:50.521Z"
+    },
+    {
+      "token": "pp_90019c8a4b614c009783bace1934acd6",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-22T15:18:16.964Z",
+      "expires_at": "2026-10-29T15:18:16.964Z"
+    }
+  ],
+  "accounts": [
+    {
+      "id": "04782644-d7e5-47a6-be08-8e8776638798",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "name": "Main Checking",
+      "account_type": "CHECKING",
+      "opening_balance": "3000.00",
+      "current_balance": "4800.00",
+      "currency": "USD",
+      "institution": "Chase",
+      "is_reconciled": true,
+      "last_reconciled_at": "2026-10-22T13:56:19.115Z",
+      "created_at": "2026-10-22T13:56:19.115Z",
+      "updated_at": "2026-10-22T13:56:19.208Z"
+    },
+    {
+      "id": "e9b2c156-eaba-47d5-b058-18bd3479bd6b",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "name": "Emergency Savings",
+      "account_type": "SAVINGS",
+      "opening_balance": "5000.00",
+      "current_balance": "6518.96",
+      "currency": "USD",
+      "institution": "Marcus",
+      "is_reconciled": true,
+      "last_reconciled_at": "2026-10-22T13:56:19.160Z",
+      "created_at": "2026-10-22T13:56:19.160Z",
+      "updated_at": "2026-10-22T14:24:26.339Z"
+    },
+    {
+      "id": "48e7965c-dce5-453b-a9ef-795d6b057474",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "name": "State Bank of India (8291)",
+      "account_type": "SAVINGS",
+      "opening_balance": "45000.00",
+      "current_balance": "44278.77",
+      "currency": "USD",
+      "account_number": "•••• 8291",
+      "institution": "State Bank of India",
+      "is_reconciled": true,
+      "last_reconciled_at": "2026-10-22T14:23:57.853Z",
+      "is_linked": true,
+      "linked_provider": "State Bank of India",
+      "created_at": "2026-10-22T14:23:57.853Z",
+      "updated_at": "2026-10-22T14:24:26.339Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-inc-1",
+      "user_id": null,
+      "name": "Salary",
+      "type": "INCOME",
+      "classification": "NONE",
+      "color": "#10b981",
+      "icon": "wallet",
+      "monthly_limit": "0.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-inc-2",
+      "user_id": null,
+      "name": "Freelance & Consulting",
+      "type": "INCOME",
+      "classification": "NONE",
+      "color": "#06b6d4",
+      "icon": "briefcase",
+      "monthly_limit": "0.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-inc-3",
+      "user_id": null,
+      "name": "Investment Returns",
+      "type": "INCOME",
+      "classification": "NONE",
+      "color": "#8b5cf6",
+      "icon": "trending-up",
+      "monthly_limit": "0.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-inc-4",
+      "user_id": null,
+      "name": "Gifts & Refunds",
+      "type": "INCOME",
+      "classification": "NONE",
+      "color": "#ec4899",
+      "icon": "gift",
+      "monthly_limit": "0.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-1",
+      "user_id": null,
+      "name": "Housing & Rent",
+      "type": "EXPENSE",
+      "classification": "NEED",
+      "color": "#ef4444",
+      "icon": "home",
+      "monthly_limit": "1200.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-2",
+      "user_id": null,
+      "name": "Groceries & Food",
+      "type": "EXPENSE",
+      "classification": "NEED",
+      "color": "#f97316",
+      "icon": "shopping-cart",
+      "monthly_limit": "500.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-3",
+      "user_id": null,
+      "name": "Utilities & Internet",
+      "type": "EXPENSE",
+      "classification": "NEED",
+      "color": "#eab308",
+      "icon": "zap",
+      "monthly_limit": "200.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-4",
+      "user_id": null,
+      "name": "Healthcare & Insurance",
+      "type": "EXPENSE",
+      "classification": "NEED",
+      "color": "#14b8a6",
+      "icon": "activity",
+      "monthly_limit": "150.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-5",
+      "user_id": null,
+      "name": "Transportation & Fuel",
+      "type": "EXPENSE",
+      "classification": "NEED",
+      "color": "#6366f1",
+      "icon": "truck",
+      "monthly_limit": "250.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-6",
+      "user_id": null,
+      "name": "Dining Out & Cafes",
+      "type": "EXPENSE",
+      "classification": "WANT",
+      "color": "#f43f5e",
+      "icon": "coffee",
+      "monthly_limit": "200.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-7",
+      "user_id": null,
+      "name": "Entertainment & Movies",
+      "type": "EXPENSE",
+      "classification": "WANT",
+      "color": "#a855f7",
+      "icon": "film",
+      "monthly_limit": "120.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-8",
+      "user_id": null,
+      "name": "Shopping & Apparel",
+      "type": "EXPENSE",
+      "classification": "WANT",
+      "color": "#3b82f6",
+      "icon": "shopping-bag",
+      "monthly_limit": "180.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-9",
+      "user_id": null,
+      "name": "Travel & Vacations",
+      "type": "EXPENSE",
+      "classification": "WANT",
+      "color": "#0ea5e9",
+      "icon": "compass",
+      "monthly_limit": "300.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-10",
+      "user_id": null,
+      "name": "Emergency Fund",
+      "type": "EXPENSE",
+      "classification": "SAVINGS",
+      "color": "#10b981",
+      "icon": "shield",
+      "monthly_limit": "400.00",
+      "is_default": true
+    },
+    {
+      "id": "cat-exp-11",
+      "user_id": null,
+      "name": "Retirement & SIPs",
+      "type": "EXPENSE",
+      "classification": "SAVINGS",
+      "color": "#059669",
+      "icon": "piggy-bank",
+      "monthly_limit": "500.00",
+      "is_default": true
+    }
+  ],
+  "transactions": [
+    {
+      "id": "19ccfb4b-f896-4e1f-8ad9-c65789131760",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "account_id": "04782644-d7e5-47a6-be08-8e8776638798",
+      "to_account_id": null,
+      "category_id": null,
+      "type": "INCOME",
+      "amount": "4500.00",
+      "transaction_date": "2026-10-22",
+      "notes": "Monthly Salary",
+      "payee": "Global Tech",
+      "is_reconciled": false,
+      "created_at": "2026-10-22T13:56:19.178Z",
+      "updated_at": "2026-10-22T13:56:19.178Z"
+    },
+    {
+      "id": "85e610c0-464b-466b-8fa9-25731eb7fb25",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "account_id": "04782644-d7e5-47a6-be08-8e8776638798",
+      "to_account_id": null,
+      "category_id": null,
+      "type": "EXPENSE",
+      "amount": "1200.00",
+      "transaction_date": "2026-10-22",
+      "notes": "Housing (Need)",
+      "payee": "Apartment Rent",
+      "is_reconciled": false,
+      "created_at": "2026-10-22T13:56:19.191Z",
+      "updated_at": "2026-10-22T13:56:19.191Z"
+    },
+    {
+      "id": "16f59567-7f2e-4062-b6a8-4762dcde353d",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "account_id": "04782644-d7e5-47a6-be08-8e8776638798",
+      "to_account_id": "e9b2c156-eaba-47d5-b058-18bd3479bd6b",
+      "category_id": null,
+      "type": "TRANSFER",
+      "amount": "1500.00",
+      "transaction_date": "2026-10-22",
+      "notes": "Transfer to Emergency Fund",
+      "payee": "",
+      "is_reconciled": false,
+      "created_at": "2026-10-22T13:56:19.208Z",
+      "updated_at": "2026-10-22T13:56:19.208Z"
+    },
+    {
+      "id": "f45d8dc5-028e-4867-8885-2208bbd8755a",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "account_id": "48e7965c-dce5-453b-a9ef-795d6b057474",
+      "type": "EXPENSE",
+      "amount": "850.00",
+      "transaction_date": "2026-10-22",
+      "notes": "Dinner order via Google Pay UPI",
+      "payee": "Swiggy Food Delivery / QR",
+      "is_reconciled": true,
+      "created_at": "2026-10-22T14:24:20.739Z",
+      "updated_at": "2026-10-22T14:24:20.739Z"
+    },
+    {
+      "id": "fdbb5686-5510-4e9c-98e3-9b6f8be54795",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "account_id": "e9b2c156-eaba-47d5-b058-18bd3479bd6b",
+      "type": "INCOME",
+      "amount": "18.96",
+      "transaction_date": "2026-10-22",
+      "notes": "Auto-credited Savings Interest (3.5% p.a. for 1 month)",
+      "payee": "Marcus Interest Credit",
+      "is_reconciled": true,
+      "created_at": "2026-10-22T14:24:26.338Z",
+      "updated_at": "2026-10-22T14:24:26.338Z"
+    },
+    {
+      "id": "9f5ce0ed-70ab-4445-8d87-75aa97e15e71",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "account_id": "48e7965c-dce5-453b-a9ef-795d6b057474",
+      "type": "INCOME",
+      "amount": "128.77",
+      "transaction_date": "2026-10-22",
+      "notes": "Auto-credited Savings Interest (3.5% p.a. for 1 month)",
+      "payee": "State Bank of India Interest Credit",
+      "is_reconciled": true,
+      "created_at": "2026-10-22T14:24:26.338Z",
+      "updated_at": "2026-10-22T14:24:26.338Z"
+    }
+  ],
+  "monthly_budgets": [],
+  "savings_goals": [],
+  "goal_contributions": [],
+  "bills_subscriptions": [],
+  "investments": [
+    {
+      "id": "dfae1ffb-c17a-48ec-bd16-525ced111841",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "investment_type": "MUTUAL_FUND_SIP",
+      "name": "Zerodha Coin Portfolio (1048)",
+      "invested_amount": "50000.00",
+      "current_value": "50548.94",
+      "annual_rate_percent": "14.0",
+      "start_date": "2026-10-22",
+      "is_linked": true,
+      "linked_provider": "Zerodha Coin",
+      "auto_growth_enabled": true,
+      "notes": "Auto-updating investment portfolio linked via Zerodha Coin",
+      "created_at": "2026-10-22T14:24:14.694Z",
+      "updated_at": "2026-10-22T14:24:26.338Z"
+    }
+  ],
+  "assets_liabilities": [],
+  "linked_providers": [
+    {
+      "id": "28859c7e-170a-46bf-99b1-79c8aae23a55",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "item_type": "BANK",
+      "provider_name": "State Bank of India",
+      "identifier": "A/C •••• 8291 (IFSC: SBIN0001234)",
+      "linked_account_id": "48e7965c-dce5-453b-a9ef-795d6b057474",
+      "status": "ACTIVE",
+      "auto_growth_enabled": true,
+      "growth_rate_percent": "3.5",
+      "last_synced_at": "2026-10-22T14:24:26.338Z",
+      "created_at": "2026-10-22T14:23:57.853Z",
+      "updated_at": "2026-10-22T14:24:26.338Z"
+    },
+    {
+      "id": "c1863921-e85e-4857-84e6-7397d4c9d6bd",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "item_type": "UPI",
+      "provider_name": "Google Pay (divyaam@oksbi)",
+      "identifier": "divyaam@oksbi",
+      "linked_account_id": "48e7965c-dce5-453b-a9ef-795d6b057474",
+      "status": "ACTIVE",
+      "auto_growth_enabled": false,
+      "last_synced_at": "2026-10-22T14:24:26.338Z",
+      "created_at": "2026-10-22T14:24:07.571Z",
+      "updated_at": "2026-10-22T14:24:26.338Z"
+    },
+    {
+      "id": "039c6eb0-2568-402a-bf55-f19f7e453f64",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "item_type": "INVESTMENT",
+      "provider_name": "Zerodha Coin",
+      "identifier": "Folio / Demat: 1048291048",
+      "linked_investment_id": "dfae1ffb-c17a-48ec-bd16-525ced111841",
+      "status": "ACTIVE",
+      "auto_growth_enabled": true,
+      "growth_rate_percent": "14.0",
+      "last_synced_at": "2026-10-22T14:24:26.338Z",
+      "created_at": "2026-10-22T14:24:14.694Z",
+      "updated_at": "2026-10-22T14:24:26.338Z"
+    }
+  ],
+  "sync_audit_logs": [
+    {
+      "id": "5a930e70-0f21-4d08-8966-3507238a484d",
+      "user_id": "0490eaad-cfc4-44ea-b125-653e1922fae4",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for REGISTRATION",
+      "timestamp": "2026-10-22T13:44:25.130Z"
+    },
+    {
+      "id": "7b6dd643-4614-4b4b-a125-33a6f9ade95e",
+      "user_id": "0490eaad-cfc4-44ea-b125-653e1922fae4",
+      "client_type": "DESKTOP_JAVAFX",
+      "action": "LOGIN",
+      "details": "Client logged in successfully",
+      "timestamp": "2026-10-22T13:44:28.983Z"
+    },
+    {
+      "id": "7c06aa49-dcf2-4826-827b-a879cb194150",
+      "user_id": "0490eaad-cfc4-44ea-b125-653e1922fae4",
+      "client_type": "WEB",
+      "action": "LOGIN",
+      "details": "Client logged in successfully",
+      "timestamp": "2026-10-22T13:44:45.627Z"
+    },
+    {
+      "id": "02566f69-468b-4c38-98c2-7f07dda089bd",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for REGISTRATION",
+      "timestamp": "2026-10-22T13:56:19.091Z"
+    },
+    {
+      "id": "588172fc-a788-4231-a252-f870d7fa9e1b",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "WEB",
+      "action": "BANK_ACCOUNT_LINKED",
+      "details": "Successfully linked State Bank of India account ending in 8291 with auto-interest accrual enabled",
+      "timestamp": "2026-10-22T14:23:57.853Z"
+    },
+    {
+      "id": "5d826ee1-c6f6-469c-9a59-c729c1397439",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "WEB",
+      "action": "UPI_LINKED",
+      "details": "Linked UPI VPA divyaam@oksbi via Google Pay",
+      "timestamp": "2026-10-22T14:24:07.571Z"
+    },
+    {
+      "id": "04521325-9ab6-4c22-87e8-81d9ed268aeb",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "WEB",
+      "action": "INVESTMENT_LINKED",
+      "details": "Linked investment portfolio with Zerodha Coin (CAGR: 14.0% p.a.)",
+      "timestamp": "2026-10-22T14:24:14.694Z"
+    },
+    {
+      "id": "9ac494bc-5d84-4310-aa38-c3f69a233c10",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "WEB",
+      "action": "UPI_TRANSACTION_AUTO_PROCESSED",
+      "details": "UPI EXPENSE: 850.00 USD with Swiggy Food Delivery / QR via divyaam@oksbi",
+      "timestamp": "2026-10-22T14:24:20.739Z"
+    },
+    {
+      "id": "877e3d5d-458c-48a9-9eab-6d2bf05b7dd8",
+      "user_id": "5a7c35ba-a070-4abf-9272-358405e02ba1",
+      "client_type": "BACKEND_API",
+      "action": "AUTO_GROWTH_EXECUTED",
+      "details": "Executed auto-growth for 1 month(s). Total accrued: +696.67 across 3 assets.",
+      "timestamp": "2026-10-22T14:24:26.338Z"
+    },
+    {
+      "id": "9ee1f7f9-81ee-471e-9a19-59a33d5ab468",
+      "user_id": "56c60c8c-d710-43c5-a310-430dec6bf22b",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for LOGIN",
+      "timestamp": "2026-10-22T14:42:08.312Z"
+    },
+    {
+      "id": "c4f17930-6580-49c1-b55c-3cd6fc7b2c5f",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for REGISTRATION",
+      "timestamp": "2026-10-22T15:10:20.452Z"
+    },
+    {
+      "id": "f9998e2d-8061-4417-8a61-03fe356eeb04",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN",
+      "details": "Client logged in successfully",
+      "timestamp": "2026-10-22T15:10:27.589Z"
+    },
+    {
+      "id": "50ffd31d-c774-4b8a-8ef2-f969682defec",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for LOGIN",
+      "timestamp": "2026-10-22T15:10:50.521Z"
+    },
+    {
+      "id": "beab811c-bcff-452e-8ea8-dc41ca446867",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for LOGIN",
+      "timestamp": "2026-10-22T15:18:16.964Z"
+    }
+  ]
+}

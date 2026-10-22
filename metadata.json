@@ -1,0 +1,6 @@
+{
+  "name": "PocketPilot",
+  "description": "Free-first personal finance platform with web and desktop clients, budgeting, savings, investments, and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
