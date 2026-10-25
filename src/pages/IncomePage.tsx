@@ -31,8 +31,11 @@ export const IncomePage: React.FC = () => {
     payee: '',
   });
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const loadData = async () => {
     setLoading(true);
+    setErrorMessage(null);
     try {
       const [txs, accs, cats] = await Promise.all([
         api.getTransactions({ type: 'INCOME' }),
@@ -46,7 +49,7 @@ export const IncomePage: React.FC = () => {
         setFormData(prev => ({ ...prev, accountId: accs[0].id }));
       }
     } catch (err: any) {
-      alert(err.message);
+      setErrorMessage(err.message || 'Failed loading income records');
     } finally {
       setLoading(false);
     }
@@ -58,6 +61,7 @@ export const IncomePage: React.FC = () => {
 
   const handleRecordIncome = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     try {
       await api.createTransaction({
         accountId: formData.accountId,
@@ -79,7 +83,7 @@ export const IncomePage: React.FC = () => {
       });
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setErrorMessage(err.message || 'Failed recording income');
     }
   };
 
@@ -105,6 +109,13 @@ export const IncomePage: React.FC = () => {
           {t('addTransaction')}
         </button>
       </div>
+
+      {errorMessage && (
+        <div className="p-3.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-xs text-rose-300 flex items-center justify-between">
+          <span>{errorMessage}</span>
+          <button onClick={() => setErrorMessage(null)} className="text-rose-400 hover:text-white cursor-pointer">✕</button>
+        </div>
+      )}
 
       {/* Income Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

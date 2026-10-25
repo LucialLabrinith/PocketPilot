@@ -23,12 +23,42 @@
     {
       "id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
       "email": "divyaam2008@gmail.com",
-      "password_hash": "379153f50008e93cb5810059e8e1b38d38b590b6f8daaaa652bb88d0cafae44b",
+      "password_hash": "dae53354cb7b85d102dfe38616002467d6b18a94caf7452ae68a5620ffa47cb2",
       "full_name": "Divyaam P",
       "currency": "INR",
       "is_verified": true,
       "created_at": "2026-10-22T15:10:03.919Z",
-      "updated_at": "2026-10-22T15:18:16.964Z"
+      "updated_at": "2026-10-25T07:33:00.219Z"
+    },
+    {
+      "id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "email": "testuser@gmail.com",
+      "password_hash": "ca81ba94442709f247a225ed6bd95faf30b9d43c6786d95a3519af558041228f",
+      "full_name": "Divyaam Sharma",
+      "currency": "USD",
+      "is_verified": true,
+      "created_at": "2026-10-23T11:42:28.999Z",
+      "updated_at": "2026-10-23T11:42:36.349Z"
+    },
+    {
+      "id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "email": "divyaam@gmail.com",
+      "password_hash": "7eead2e93b7ba157d9705f778fca01413ff57b3ad4eb5f4ac9307dea1cc3b60e",
+      "full_name": "Divyaam Patel",
+      "currency": "INR",
+      "is_verified": true,
+      "created_at": "2026-10-23T14:00:42.654Z",
+      "updated_at": "2026-10-23T14:01:47.458Z"
+    },
+    {
+      "id": "bf79e6cc-6cb0-4fe2-8503-45a89ef9cd18",
+      "email": "switchtest@finflow.app",
+      "password_hash": "ca81ba94442709f247a225ed6bd95faf30b9d43c6786d95a3519af558041228f",
+      "full_name": "Switch Tester",
+      "currency": "USD",
+      "is_verified": true,
+      "created_at": "2026-10-25T12:58:58.534Z",
+      "updated_at": "2026-10-25T12:59:35.700Z"
     }
   ],
   "otp_verifications": [
@@ -127,6 +157,66 @@
       "expires_at": "2026-10-22T15:28:09.783Z",
       "is_used": true,
       "created_at": "2026-10-22T15:18:09.782Z"
+    },
+    {
+      "id": "8d2916da-b418-4246-bf81-60e0c52cdb4b",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "999483",
+      "purpose": "PASSWORD_RESET",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-23T10:45:03.143Z",
+      "expires_at": "2026-10-23T10:55:03.143Z",
+      "is_used": true,
+      "created_at": "2026-10-23T10:45:03.143Z"
+    },
+    {
+      "id": "0d3d3fa4-0f2b-4688-8d9e-6c84e0a90fae",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "989762",
+      "purpose": "PASSWORD_RESET",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-23T11:21:36.808Z",
+      "expires_at": "2026-10-23T11:31:36.808Z",
+      "is_used": true,
+      "created_at": "2026-10-23T11:21:36.808Z"
+    },
+    {
+      "id": "ecd5dc8d-9762-4158-9f5d-e68fb470f0a4",
+      "email": "testuser@gmail.com",
+      "otp_code": "280941",
+      "purpose": "REGISTRATION",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-23T11:42:28.999Z",
+      "expires_at": "2026-10-23T11:52:28.999Z",
+      "is_used": true,
+      "created_at": "2026-10-23T11:42:28.999Z"
+    },
+    {
+      "id": "9718874e-26f5-49ed-b93d-0e5261089365",
+      "email": "divyaam2008@gmail.com",
+      "otp_code": "412650",
+      "purpose": "REGISTRATION",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-24T09:26:43.960Z",
+      "expires_at": "2026-10-24T09:36:43.960Z",
+      "is_used": false,
+      "created_at": "2026-10-24T09:26:43.960Z"
+    },
+    {
+      "id": "d1ee75a9-5f64-489a-a672-ec527a2cfe9d",
+      "email": "switchtest@finflow.app",
+      "otp_code": "402960",
+      "purpose": "REGISTRATION",
+      "attempts": 0,
+      "resend_count": 0,
+      "last_sent_at": "2026-10-25T12:58:58.534Z",
+      "expires_at": "2026-10-25T13:08:58.534Z",
+      "is_used": true,
+      "created_at": "2026-10-25T12:58:58.534Z"
     }
   ],
   "sessions": [
@@ -178,6 +268,83 @@
       "client_type": "WEB",
       "created_at": "2026-10-22T15:18:16.964Z",
       "expires_at": "2026-10-29T15:18:16.964Z"
+    },
+    {
+      "token": "pp_c36a5d61931e4093b81e1eac831a60a9",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T10:45:08.441Z",
+      "expires_at": "2026-10-30T10:45:08.441Z"
+    },
+    {
+      "token": "pp_2c3f61b0fc0946d4b5b2c61dac5db132",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T10:45:13.878Z",
+      "expires_at": "2026-10-30T10:45:13.878Z"
+    },
+    {
+      "token": "pp_330f3951ec5d4772a20993d8b25edd09",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T11:21:59.366Z",
+      "expires_at": "2026-10-30T11:21:59.366Z"
+    },
+    {
+      "token": "pp_6e63f6801ce74d7db84d68e7880dc053",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T11:26:03.299Z",
+      "expires_at": "2026-10-30T11:26:03.299Z"
+    },
+    {
+      "token": "pp_f3365ed091474b70838f2c0aa624f896",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "DESKTOP_JAVAFX",
+      "created_at": "2026-10-23T11:27:42.467Z",
+      "expires_at": "2026-10-30T11:27:42.467Z"
+    },
+    {
+      "token": "pp_4648006c40bd417a952fb4286e0fefda",
+      "user_id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T11:42:36.349Z",
+      "expires_at": "2026-10-30T11:42:36.349Z"
+    },
+    {
+      "token": "pp_994df4397513471f82b52d4134c6ab02",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T14:00:42.654Z",
+      "expires_at": "2026-10-30T14:00:42.655Z"
+    },
+    {
+      "token": "pp_e510fa1505dc4801ac08f0e833610da1",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "created_at": "2026-10-23T14:01:47.458Z",
+      "expires_at": "2026-10-30T14:01:47.459Z"
+    },
+    {
+      "token": "pp_974d76db36c141eca0eb7a5396ba9361",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-24T09:03:09.117Z",
+      "expires_at": "2026-10-31T09:03:09.117Z"
+    },
+    {
+      "token": "pp_755e4efddd464f048f2dfb69cc89a659",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-25T07:33:00.219Z",
+      "expires_at": "2026-11-01T07:33:00.220Z"
+    },
+    {
+      "token": "pp_f9c67e8df58c453598d3ed8ab69baf0d",
+      "user_id": "bf79e6cc-6cb0-4fe2-8503-45a89ef9cd18",
+      "client_type": "WEB",
+      "created_at": "2026-10-25T12:59:35.700Z",
+      "expires_at": "2026-11-01T12:59:35.700Z"
     }
   ],
   "accounts": [
@@ -225,6 +392,32 @@
       "linked_provider": "State Bank of India",
       "created_at": "2026-10-22T14:23:57.853Z",
       "updated_at": "2026-10-22T14:24:26.339Z"
+    },
+    {
+      "id": "f9fb9e4a-900a-46dc-b0c5-e6b6013e1f1e",
+      "user_id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "name": "HDFC Salary Vault",
+      "account_type": "SAVINGS",
+      "opening_balance": "50000.00",
+      "current_balance": "100000.00",
+      "currency": "INR",
+      "account_number": "•••• •••• 9104",
+      "account_number_encrypted": "v1:43257abc26cd92d60a20c56b:d2842f6f66c0604667df7d871068f811:936b6fc8d57fcecbfa7fc8ed",
+      "account_number_masked": "•••• •••• 9104",
+      "country": "India",
+      "ifsc_code": "HDFC0000060",
+      "ifsc_code_encrypted": "v1:51a7a485d2f8193c5fe0eda1:ab7b00e8b765a2a32e8c939fef2b8605:aaa0cb296acf1934c8e4fb",
+      "branch_name": "Mumbai Fort Branch",
+      "institution": "HDFC Bank",
+      "is_reconciled": true,
+      "last_reconciled_at": "2026-10-23T11:42:53.612Z",
+      "is_linked": true,
+      "linked_provider": "HDFC Bank Direct Sync",
+      "last_synced_at": "2026-10-23T11:42:53.612Z",
+      "sync_status": "SYNCED",
+      "created_at": "2026-10-23T11:42:46.966Z",
+      "updated_at": "2026-10-23T11:42:53.612Z",
+      "security_seal": "b4701728e4a53090"
     }
   ],
   "categories": [
@@ -478,9 +671,34 @@
       "is_reconciled": true,
       "created_at": "2026-10-22T14:24:26.338Z",
       "updated_at": "2026-10-22T14:24:26.338Z"
+    },
+    {
+      "id": "607e1ac2-ea57-420f-b84c-4f73a5d96068",
+      "user_id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "account_id": "f9fb9e4a-900a-46dc-b0c5-e6b6013e1f1e",
+      "type": "INCOME",
+      "amount": "50000.00",
+      "transaction_date": "2026-10-23",
+      "payee": "HDFC Bank Opening Balance Sync",
+      "notes": "Initial verified balance for account ending in 9104 (HDFC0000060)",
+      "is_reconciled": true,
+      "created_at": "2026-10-23T11:42:46.966Z",
+      "updated_at": "2026-10-23T11:42:46.966Z"
     }
   ],
-  "monthly_budgets": [],
+  "monthly_budgets": [
+    {
+      "id": "9acc4e75-1cc9-489e-8364-ff95ba67a83c",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "month_year": "2026-10",
+      "monthly_income_target": "3000.00",
+      "needs_percentage": 50,
+      "wants_percentage": 30,
+      "savings_percentage": 20,
+      "created_at": "2026-10-23T11:22:00.502Z",
+      "updated_at": "2026-10-23T11:22:00.502Z"
+    }
+  ],
   "savings_goals": [],
   "goal_contributions": [],
   "bills_subscriptions": [],
@@ -658,6 +876,158 @@
       "action": "OTP_VERIFIED",
       "details": "User verified OTP for LOGIN",
       "timestamp": "2026-10-22T15:18:16.964Z"
+    },
+    {
+      "id": "93cb83f5-8223-49fa-aeb4-4f47d63ef33f",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "PASSWORD_RESET",
+      "details": "Password was updated successfully with recovery OTP",
+      "timestamp": "2026-10-23T10:45:08.441Z"
+    },
+    {
+      "id": "8eac3190-9d69-40f8-9517-f9c3c94903d5",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN",
+      "details": "User logged in successfully with database password",
+      "timestamp": "2026-10-23T10:45:13.878Z"
+    },
+    {
+      "id": "ea42c16a-f3b9-4fcb-8330-116d77fb9138",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "PASSWORD_RESET",
+      "details": "Password was updated successfully with recovery OTP",
+      "timestamp": "2026-10-23T11:21:59.366Z"
+    },
+    {
+      "id": "afe19c59-9d8a-4559-aeed-e4d0954ce762",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam2008@gmail.com",
+      "timestamp": "2026-10-23T11:26:03.299Z"
+    },
+    {
+      "id": "94074b5e-12bd-40c5-bfa0-2302dc341a93",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "DESKTOP_JAVAFX",
+      "action": "LOGIN",
+      "details": "User logged in successfully with database password",
+      "timestamp": "2026-10-23T11:27:42.467Z"
+    },
+    {
+      "id": "93a53085-b8ad-4053-b41d-d216445547e5",
+      "user_id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for REGISTRATION",
+      "timestamp": "2026-10-23T11:42:36.349Z"
+    },
+    {
+      "id": "bf8e076e-d449-4e52-b06b-b91a32c1c9bc",
+      "user_id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "client_type": "WEB",
+      "action": "ACCOUNT_VAULT_ENCRYPTED",
+      "details": "Account HDFC Salary Vault (HDFC Bank) secured with AES-256-GCM and HMAC-SHA256 seal",
+      "timestamp": "2026-10-23T11:42:46.966Z"
+    },
+    {
+      "id": "56eecc44-b7f6-4124-b567-ab6bff8c40bd",
+      "user_id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
+      "client_type": "WEB",
+      "action": "REAL_ACCOUNT_SYNC",
+      "details": "Account HDFC Salary Vault synced with real existing balance: INR 100000.00",
+      "timestamp": "2026-10-23T11:42:53.612Z"
+    },
+    {
+      "id": "8fa0653e-5dd4-4123-80d2-3e4fc428700b",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam@gmail.com",
+      "timestamp": "2026-10-23T14:00:42.654Z"
+    },
+    {
+      "id": "92e65e23-243f-48b3-b1db-4bdaab469d61",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "ACCOUNT_VAULT_ENCRYPTED",
+      "details": "Account HDFC Salary & Savings (HDFC Bank) secured with AES-256-GCM and HMAC-SHA256 seal",
+      "timestamp": "2026-10-23T14:01:08.383Z"
+    },
+    {
+      "id": "cb8441f1-beac-4c69-b463-b50053c4cd87",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam@gmail.com",
+      "timestamp": "2026-10-23T14:01:47.458Z"
+    },
+    {
+      "id": "37eb2100-2d9b-4791-b155-8cdcea916290",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "ACCOUNT_VAULT_ENCRYPTED",
+      "details": "Account HDFC Salary Account (HDFC Bank) secured with AES-256-GCM and HMAC-SHA256 seal",
+      "timestamp": "2026-10-23T14:01:47.479Z"
+    },
+    {
+      "id": "721822fc-83b1-4825-a815-9553c318b0c3",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "UPI_PAYMENT_SUCCESS",
+      "details": "Paid INR 1200.00 to Blue Tokai Coffee (WANT) via HDFC Salary Account. Purpose: Coffee & Brunch with Friends",
+      "timestamp": "2026-10-23T14:01:47.530Z"
+    },
+    {
+      "id": "cb48bd96-7360-41c8-a494-c0b01690cf6c",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "UPI_RECEIVE_SUCCESS",
+      "details": "Received INR 5000.00 from Rahul Sharma (ICICI Bank) into HDFC Salary Account",
+      "timestamp": "2026-10-23T14:01:47.549Z"
+    },
+    {
+      "id": "752b4431-8cf5-4f2e-a0a3-7d5c42155e4b",
+      "user_id": "486adcf0-210a-4793-923a-7b00f355f612",
+      "client_type": "WEB",
+      "action": "POCKETMONEY_SPENT",
+      "details": "Spent ₹ 40.00 on Masala Chai (Tea & Snacks) via PocketMoney",
+      "timestamp": "2026-10-23T14:01:47.584Z"
+    },
+    {
+      "id": "223e2859-fc48-49d8-9774-89a29b78ed8b",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam2008@gmail.com",
+      "timestamp": "2026-10-24T09:03:09.117Z"
+    },
+    {
+      "id": "ad50ebad-22e7-4cf7-813c-da3a691c141e",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam2008@gmail.com",
+      "timestamp": "2026-10-25T07:33:00.219Z"
+    },
+    {
+      "id": "6127bc62-46c0-4607-8c8c-7909d78b3cdf",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "ACCOUNT_VAULT_ENCRYPTED",
+      "details": "Account State Bank of India (Savings) (State Bank of India) secured with AES-256-GCM and HMAC-SHA256 seal",
+      "timestamp": "2026-10-25T07:34:20.186Z"
+    },
+    {
+      "id": "838e4047-6a14-421b-a24b-6377b8244594",
+      "user_id": "bf79e6cc-6cb0-4fe2-8503-45a89ef9cd18",
+      "client_type": "WEB",
+      "action": "OTP_VERIFIED",
+      "details": "User verified OTP for REGISTRATION",
+      "timestamp": "2026-10-25T12:59:35.700Z"
     }
   ]
 }

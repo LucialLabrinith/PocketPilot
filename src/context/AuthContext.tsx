@@ -14,6 +14,7 @@ interface AuthContextType {
   theme: 'dark' | 'light';
   toggleTheme: () => void;
   login: (email: string, password: string, clientType?: string) => Promise<any>;
+  googleLogin: (payload: { credential?: string; email?: string; fullName?: string; googleId?: string; clientType?: string }) => Promise<any>;
   register: (email: string, password: string, fullName: string, currency: string) => Promise<any>;
   verifyOtp: (email: string, otpCode: string, purpose?: string) => Promise<any>;
   logout: () => Promise<void>;
@@ -37,10 +38,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     if (theme === 'dark') {
       root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+      if (body) {
+        body.classList.add('dark');
+        body.setAttribute('data-theme', 'dark');
+      }
     } else {
       root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+      if (body) {
+        body.classList.remove('dark');
+        body.setAttribute('data-theme', 'light');
+      }
     }
     localStorage.setItem('pocketpilot_theme', theme);
   }, [theme]);
@@ -110,12 +122,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return res;
   };
 
+  const googleLogin = async (payload: { credential?: string; email?: string; fullName?: string; googleId?: string; clientType?: string }) => {
+    const res = await api.googleLogin(payload);
+    if (res.data?.token) {
+      localStorage.setItem('pocketpilot_token', res.data.token);
+      localStorage.setItem('pocketpilot_user', JSON.stringify(res.data));
+      setToken(res.data.token);
+      setUser(res.data);
+      setDevOtp(null);
+      setPendingEmail(null);
+    }
+    return res;
+  };
+
   const logout = async () => {
-    await api.logout();
-    setUser(null);
-    setToken(null);
-    setDevOtp(null);
-    setPendingEmail(null);
+    try {
+      await api.logout();
+    } catch {
+      // Ignore network errors on logout
+    } finally {
+      localStorage.removeItem('pocketpilot_token');
+      localStorage.removeItem('pocketpilot_user');
+      setUser(null);
+      setToken(null);
+      setDevOtp(null);
+      setPendingEmail(null);
+    }
   };
 
   const refreshUser = async () => {
@@ -144,6 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         theme,
         toggleTheme,
         login,
+        googleLogin,
         register,
         verifyOtp,
         logout,

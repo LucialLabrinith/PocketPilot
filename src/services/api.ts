@@ -8,7 +8,11 @@ import {
   Investment,
   AssetLiability,
   FinancialSummary,
-  SyncAuditLog
+  SyncAuditLog,
+  UpiPayRequest,
+  PocketMoneyState,
+  LegalTransferCertificate,
+  SwitchStatusInfo
 } from '../types';
 
 const API_BASE = '/api';
@@ -69,6 +73,15 @@ export const api = {
       body: JSON.stringify(payload),
     });
     return handleResponse<{ success: boolean; message: string; data: any; devOtp?: string; requiresVerification?: boolean; emailDelivery?: any }>(res);
+  },
+
+  async googleLogin(payload: { credential?: string; email?: string; fullName?: string; googleId?: string; clientType?: string }) {
+    const res = await fetch(`${API_BASE}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
   },
 
   async getSmtpStatus() {
@@ -151,7 +164,22 @@ export const api = {
     return result.data;
   },
 
-  async createAccount(data: { name: string; accountType: string; openingBalance: string; currency?: string; accountNumber?: string; institution?: string }) {
+  async createAccount(data: {
+    name: string;
+    accountType: string;
+    openingBalance: string;
+    currency?: string;
+    accountNumber?: string;
+    institution?: string;
+    country?: string;
+    ifscCode?: string;
+    branchName?: string;
+    upiVpa?: string;
+    upiPin?: string;
+    isPrimaryReceiving?: boolean;
+    isLinked?: boolean;
+    linkedProvider?: string;
+  }) {
     const res = await fetch(`${API_BASE}/accounts`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
@@ -179,6 +207,14 @@ export const api = {
 
   async reconcileAccount(id: string) {
     const res = await fetch(`${API_BASE}/accounts/${id}/reconcile`, {
+      method: 'POST',
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; message: string; data: Account }>(res);
+  },
+
+  async syncAccount(id: string) {
+    const res = await fetch(`${API_BASE}/accounts/${id}/sync`, {
       method: 'POST',
       headers: { ...getAuthHeader() },
     });
@@ -420,7 +456,7 @@ export const api = {
     return result.data;
   },
 
-  async linkBank(data: { bankName: string; accountNumber: string; ifscOrRouting?: string; accountType?: string; openingBalance?: string }) {
+  async linkBank(data: { bankName: string; accountNumber: string; ifscOrRouting?: string; branchName?: string; country?: string; accountType?: string; openingBalance?: string }) {
     const res = await fetch(`${API_BASE}/linked/bank`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
@@ -471,5 +507,239 @@ export const api = {
       headers: { ...getAuthHeader() },
     });
     return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
+  // UPI Super Pay & Balance APIs
+  async setPrimaryReceivingAccount(id: string) {
+    const res = await fetch(`${API_BASE}/accounts/${id}/set-primary-receiving`, {
+      method: 'POST',
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; message: string; primaryAccountId: string }>(res);
+  },
+
+  async setUpiPin(id: string, upiPin: string) {
+    const res = await fetch(`${API_BASE}/accounts/${id}/set-upi-pin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ upiPin }),
+    });
+    return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
+  async checkUpiBalance(accountId: string, upiPin?: string) {
+    const res = await fetch(`${API_BASE}/upi/check-balance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ accountId, upiPin }),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  async payUpi(payload: UpiPayRequest) {
+    const res = await fetch(`${API_BASE}/upi/pay`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  async receiveUpi(payload: {
+    receivingAccountId?: string;
+    amount: string;
+    senderName?: string;
+    senderBank?: string;
+    senderUpiId?: string;
+    classification?: string;
+    notes?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/upi/receive`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  async lookupUpiDirectory(query: string) {
+    const res = await fetch(`${API_BASE}/upi/directory-lookup?query=${encodeURIComponent(query)}`, {
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; found: boolean; verifiedName: string | null; vpa?: string; bank?: string; ifsc?: string; message: string }>(res);
+  },
+
+  async unlinkAllAccounts() {
+    const res = await fetch(`${API_BASE}/accounts/unlink-all`, {
+      method: 'POST',
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
+  async linkPresetBank(bank: 'HDFC' | 'SBI' | 'ICICI' = 'HDFC') {
+    const res = await fetch(`${API_BASE}/accounts/link-preset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ bank }),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  // Pinnacle CBS & NPCI Switch Legal Clearing APIs
+  async getSwitchStatus() {
+    const res = await fetch(`${API_BASE}/switch/status`, {
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; data: SwitchStatusInfo }>(res);
+  },
+
+  async verifyTransferree(query: string) {
+    const res = await fetch(`${API_BASE}/switch/verify-transferree`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ query }),
+    });
+    return handleResponse<{ success: boolean; data: any }>(res);
+  },
+
+  async calculateTransferFee(amount: string, payeeType: string = 'P2P') {
+    const res = await fetch(`${API_BASE}/switch/calculate-fee`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ amount, payeeType }),
+    });
+    return handleResponse<{ success: boolean; data: any }>(res);
+  },
+
+  async pingSwitch(target: 'PINNACLE_CBS' | 'NPCI_SWITCH' = 'PINNACLE_CBS') {
+    const res = await fetch(`${API_BASE}/switch/ping`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ target }),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  async getLegalCertificate(txId: string) {
+    const res = await fetch(`${API_BASE}/switch/certificate/${txId}`, {
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; data: LegalTransferCertificate }>(res);
+  },
+
+  // Trading & Fixed Deposits (FD) Portfolio APIs
+  async getTradingPortfolio() {
+    const res = await fetch(`${API_BASE}/trading/portfolio`, {
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; data: any }>(res);
+  },
+
+  async connectBroker(brokerApp: string, clientCode?: string) {
+    const res = await fetch(`${API_BASE}/trading/connect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ brokerApp, clientCode }),
+    });
+    return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
+  async addTrade(payload: {
+    investmentType?: string;
+    brokerApp?: string;
+    name: string;
+    stockSymbol?: string;
+    quantity?: number | string;
+    buyPrice?: string;
+    investedAmount?: string;
+    annualRatePercent?: string;
+    fdTenureMonths?: number | string;
+    maturityDate?: string;
+  }) {
+    const res = await fetch(`${API_BASE}/trading/trade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  async syncMarket() {
+    const res = await fetch(`${API_BASE}/trading/sync-market`, {
+      method: 'POST',
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
+  // PocketMoney Engine APIs
+  async getPocketMoney() {
+    const res = await fetch(`${API_BASE}/pocketmoney`, {
+      headers: { ...getAuthHeader() },
+    });
+    return handleResponse<{ success: boolean; data: PocketMoneyState }>(res);
+  },
+
+  async updatePocketMoneyConfig(config: { dailyLimit?: string; sourceAccountId?: string }) {
+    const res = await fetch(`${API_BASE}/pocketmoney/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify(config),
+    });
+    return handleResponse<{ success: boolean; message: string }>(res);
+  },
+
+  async spendPocketMoney(payload: { amount: string; title: string; category?: string; classification?: string }) {
+    const res = await fetch(`${API_BASE}/pocketmoney/spend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify(payload),
+    });
+    return handleResponse<{ success: boolean; message: string; data: any }>(res);
+  },
+
+  // Bank Directory, States, Cities & Registered IFSC APIs
+  async getBankingCountries() {
+    const res = await fetch(`${API_BASE}/banking/countries`);
+    return handleResponse<{ success: boolean; data: any[] }>(res);
+  },
+
+  async getBankingStates(country = 'IN') {
+    const res = await fetch(`${API_BASE}/banking/states?country=${encodeURIComponent(country)}`);
+    return handleResponse<{ success: boolean; country: string; data: string[] }>(res);
+  },
+
+  async getBankingCities(country = 'IN', state?: string) {
+    const q = state ? `&state=${encodeURIComponent(state)}` : '';
+    const res = await fetch(`${API_BASE}/banking/cities?country=${encodeURIComponent(country)}${q}`);
+    return handleResponse<{ success: boolean; country: string; state?: string; data: string[] }>(res);
+  },
+
+  async getBankingBanks(country = 'IN', state?: string, city?: string) {
+    const params = new URLSearchParams({ country });
+    if (state) params.set('state', state);
+    if (city) params.set('city', city);
+    const res = await fetch(`${API_BASE}/banking/banks?${params.toString()}`);
+    return handleResponse<{ success: boolean; data: any[] }>(res);
+  },
+
+  async getBankingBranches(country = 'IN', state?: string, city?: string, bankId?: string) {
+    const params = new URLSearchParams({ country });
+    if (state) params.set('state', state);
+    if (city) params.set('city', city);
+    if (bankId) params.set('bankId', bankId);
+    const res = await fetch(`${API_BASE}/banking/branches?${params.toString()}`);
+    return handleResponse<{ success: boolean; data: any[] }>(res);
+  },
+
+  async lookupIfsc(code: string) {
+    const res = await fetch(`${API_BASE}/banking/lookup-ifsc/${encodeURIComponent(code.trim().toUpperCase())}`);
+    return handleResponse<{ success: boolean; data: { bank: any; branch: any; country: string } }>(res);
+  },
+
+  async searchBankingCatalog(query: string, country = 'IN') {
+    const res = await fetch(`${API_BASE}/banking/search?q=${encodeURIComponent(query)}&country=${encodeURIComponent(country)}`);
+    return handleResponse<{ success: boolean; data: any[] }>(res);
   }
 };

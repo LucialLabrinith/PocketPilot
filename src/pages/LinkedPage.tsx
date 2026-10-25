@@ -3,6 +3,16 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { api } from '../services/api';
 import { Account, Investment } from '../types';
+import { PageId } from '../components/Navigation';
+import {
+  COUNTRY_BANK_CATALOG,
+  getCountryBanking,
+  detectBankFromIfsc,
+  CountryBankingInfo,
+  BankInfo,
+  BankBranch
+} from '../data/bankCatalog';
+import { BankBranchSelector } from '../components/BankBranchSelector';
 import {
   Building2,
   Smartphone,
@@ -19,10 +29,23 @@ import {
   Send,
   ArrowRight,
   Sparkles,
-  QrCode
+  QrCode,
+  Lock,
+  Landmark,
+  Shield,
+  KeyRound,
+  Coins,
+  LayoutDashboard,
+  Wallet,
+  Receipt,
+  Scale
 } from 'lucide-react';
 
-export const LinkedPage: React.FC = () => {
+interface LinkedPageProps {
+  onNavigate?: (page: PageId) => void;
+}
+
+export const LinkedPage: React.FC<LinkedPageProps> = ({ onNavigate }) => {
   const { user } = useAuth();
   const { t, formatCurrency, formatNumber, formatDate, formatDigits } = useLanguage();
   const [linkedItems, setLinkedItems] = useState<any[]>([]);
@@ -30,6 +53,7 @@ export const LinkedPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [growthLog, setGrowthLog] = useState<string[]>([]);
+  const [syncingAccountId, setSyncingAccountId] = useState<string | null>(null);
 
   // Modals
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
@@ -37,11 +61,20 @@ export const LinkedPage: React.FC = () => {
   const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false);
   const [isSimulateUpiModalOpen, setIsSimulateUpiModalOpen] = useState(false);
 
+  // Country Bank Catalog state
+  const defaultCountry = COUNTRY_BANK_CATALOG[0]; // India
+  const [selectedCountryName, setSelectedCountryName] = useState<string>('India');
+  const [selectedBankId, setSelectedBankId] = useState<string>(defaultCountry.banks[0]?.id || 'sbi');
+  const [selectedBranchCode, setSelectedBranchCode] = useState<string>(defaultCountry.banks[0]?.branches[0]?.code || 'SBIN0000300');
+  const [ifscFormatValid, setIfscFormatValid] = useState<boolean>(true);
+
   // Forms
   const [bankForm, setBankForm] = useState({
-    bankName: 'HDFC Bank',
-    accountNumber: '501004829104',
-    ifscOrRouting: 'HDFC0000123',
+    country: 'India',
+    bankName: 'State Bank of India (SBI)',
+    branchName: 'Mumbai Main Branch (Fort)',
+    accountNumber: '38192048190',
+    ifscOrRouting: 'SBIN0000300',
     accountType: 'SAVINGS',
     openingBalance: '25000.00',
   });
@@ -67,6 +100,97 @@ export const LinkedPage: React.FC = () => {
     merchantOrPayer: 'Starbucks Cafe / QR Scan',
     notes: 'Coffee and breakfast via UPI',
   });
+
+  // Current active country config
+  const activeCountry = getCountryBanking(selectedCountryName) || defaultCountry;
+
+  // Sync real account with live balance calculation
+  const handleSyncAccount = async (accId: string) => {
+    setSyncingAccountId(accId);
+    try {
+      const res = await api.syncAccount(accId);
+      setStatusMessage(res.message);
+      await loadData();
+    } catch (err: any) {
+      setStatusMessage(`Error: ${err.message || 'Sync failed'}`);
+    } finally {
+      setSyncingAccountId(null);
+    }
+  };
+
+  // When country changes, update active bank and branch
+  const handleCountryChange = (countryName: string) => {
+    setSelectedCountryName(countryName);
+    const countryObj = getCountryBanking(countryName) || defaultCountry;
+    const firstBank = countryObj.banks[0];
+    const firstBranch = firstBank?.branches[0];
+
+    setSelectedBankId(firstBank?.id || '');
+    setSelectedBranchCode(firstBranch?.code || '');
+    setBankForm(prev => ({
+      ...prev,
+      country: countryName,
+      bankName: firstBank?.name || '',
+      branchName: firstBranch?.branchName || '',
+      ifscOrRouting: firstBranch?.code || '',
+    }));
+    setIfscFormatValid(true);
+  };
+
+  // When bank changes, update active branch and IFSC
+  const handleBankChange = (bankId: string) => {
+    setSelectedBankId(bankId);
+    const bank = activeCountry.banks.find(b => b.id === bankId);
+    const firstBranch = bank?.branches[0];
+
+    setSelectedBranchCode(firstBranch?.code || '');
+    setBankForm(prev => ({
+      ...prev,
+      bankName: bank?.name || prev.bankName,
+      branchName: firstBranch?.branchName || '',
+      ifscOrRouting: firstBranch?.code || '',
+    }));
+    setIfscFormatValid(true);
+  };
+
+  // When branch changes, auto-fill IFSC/code
+  const handleBranchChange = (branchCode: string) => {
+    setSelectedBranchCode(branchCode);
+    const bank = activeCountry.banks.find(b => b.id === selectedBankId);
+    const branch = bank?.branches.find(br => br.code === branchCode);
+
+    if (branch) {
+      setBankForm(prev => ({
+        ...prev,
+        branchName: branch.branchName,
+        ifscOrRouting: branch.code,
+      }));
+      setIfscFormatValid(true);
+    }
+  };
+
+  // Manual IFSC change with auto-detection
+  const handleIfscChange = (val: string) => {
+    const upper = val.toUpperCase().trim();
+    setBankForm(prev => ({ ...prev, ifscOrRouting: upper }));
+
+    if (activeCountry.codeRegex) {
+      setIfscFormatValid(upper === '' || activeCountry.codeRegex.test(upper));
+    }
+
+    // Auto-detect bank from code if India
+    if (activeCountry.code === 'IN' && upper.length >= 4) {
+      const detected = detectBankFromIfsc(upper);
+      if (detected?.bank && detected.bank.id !== selectedBankId) {
+        setSelectedBankId(detected.bank.id);
+        setBankForm(prev => ({
+          ...prev,
+          bankName: detected.bank!.name,
+          branchName: detected.branch?.branchName || prev.branchName
+        }));
+      }
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -97,7 +221,7 @@ export const LinkedPage: React.FC = () => {
       setIsBankModalOpen(false);
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setStatusMessage(`Error: ${err.message || 'Linking bank failed'}`);
     }
   };
 
@@ -109,7 +233,7 @@ export const LinkedPage: React.FC = () => {
       setIsUpiModalOpen(false);
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setStatusMessage(`Error: ${err.message || 'Linking UPI failed'}`);
     }
   };
 
@@ -121,7 +245,7 @@ export const LinkedPage: React.FC = () => {
       setIsInvestmentModalOpen(false);
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setStatusMessage(`Error: ${err.message || 'Linking investments failed'}`);
     }
   };
 
@@ -133,7 +257,7 @@ export const LinkedPage: React.FC = () => {
       setIsSimulateUpiModalOpen(false);
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setStatusMessage(`Error: ${err.message || 'UPI simulation failed'}`);
     }
   };
 
@@ -147,7 +271,7 @@ export const LinkedPage: React.FC = () => {
       }
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setStatusMessage(`Error: ${err.message || 'Auto-growth simulation failed'}`);
     }
   };
 
@@ -157,7 +281,7 @@ export const LinkedPage: React.FC = () => {
       await api.unlinkProvider(id);
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setStatusMessage(`Error: ${err.message || 'Failed unlinking provider'}`);
     }
   };
 
@@ -169,12 +293,69 @@ export const LinkedPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Cross-Page Quick Navigation Bar */}
+      {onNavigate && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+          <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider shrink-0 flex items-center gap-1">
+            Navigate:
+          </span>
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <LayoutDashboard className="h-3.5 w-3.5 text-sky-500" />
+            Dashboard
+          </button>
+          <button
+            onClick={() => onNavigate('accounts')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <Wallet className="h-3.5 w-3.5 text-blue-500" />
+            Accounts &amp; Cards
+          </button>
+          <button
+            onClick={() => onNavigate('linked')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-sky-500 bg-sky-500/10 text-sky-600 dark:text-sky-300 font-semibold shrink-0 shadow-2xs cursor-pointer"
+          >
+            <Smartphone className="h-3.5 w-3.5 text-sky-500" />
+            Linked Banking (Auto-Sync)
+          </button>
+          <button
+            onClick={() => onNavigate('transactions')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <Receipt className="h-3.5 w-3.5 text-amber-500" />
+            Transactions
+          </button>
+          <button
+            onClick={() => onNavigate('investments')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+            Investments &amp; SIPs
+          </button>
+          <button
+            onClick={() => onNavigate('networth')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <Scale className="h-3.5 w-3.5 text-purple-500" />
+            Net Worth
+          </button>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-            {t('linkedTitle')}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              {t('linkedTitle')}
+            </h1>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+              <ShieldCheck className="h-3 w-3" />
+              AES-256 Encrypted
+            </span>
+          </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             {t('linkedSubtitle')}
           </p>
@@ -192,12 +373,12 @@ export const LinkedPage: React.FC = () => {
       </div>
 
       {statusMessage && (
-        <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-300 flex items-center justify-between">
+        <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-300 flex items-center justify-between animate-in fade-in">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
             <span>{statusMessage}</span>
           </div>
-          <button onClick={() => setStatusMessage(null)} className="text-emerald-400 hover:text-white">
+          <button onClick={() => setStatusMessage(null)} className="text-emerald-400 hover:text-white cursor-pointer">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -228,7 +409,7 @@ export const LinkedPage: React.FC = () => {
             <Building2 className="h-5 w-5" />
           </div>
           <h3 className="font-bold text-sm text-slate-900 dark:text-white">{t('linkBankAccountBtn')}</h3>
-          <p className="text-xs text-slate-500 mt-1">Connect SBI, HDFC, ICICI, Axis or US banks</p>
+          <p className="text-xs text-slate-500 mt-1">Connect Indian IFSC banks, US routing, UK or global accounts</p>
         </button>
 
         <button
@@ -295,28 +476,64 @@ export const LinkedPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {bankItems.map(item => {
               const acc = accounts.find(a => a.id === item.linked_account_id);
+              const isSyncing = syncingAccountId === acc?.id;
               return (
-                <div key={item.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col justify-between space-y-3">
+                <div key={item.id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col justify-between space-y-3 shadow-2xs">
                   <div>
                     <div className="flex items-start justify-between">
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400">
-                          {item.status}
-                        </span>
-                        <h3 className="font-bold text-sm text-slate-900 dark:text-white mt-1">{item.provider_name}</h3>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                            {item.status}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            <Lock className="h-2.5 w-2.5" />
+                            AES-256 Vault
+                          </span>
+                          {acc?.security_seal && (
+                            <span className="text-[9px] font-mono text-slate-400" title={`HMAC: ${acc.security_seal}`}>
+                              HMAC-SHA256 ✓
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-bold text-sm text-slate-900 dark:text-white mt-1.5">{item.provider_name}</h3>
                         <p className="text-xs text-slate-400 font-mono mt-0.5">{item.identifier}</p>
+                        {acc?.branch_name && (
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+                            <Landmark className="h-3 w-3 text-sky-400 shrink-0" />
+                            {acc.branch_name}
+                          </p>
+                        )}
+                        {acc?.ifsc_code && (
+                          <p className="text-[10px] font-mono text-sky-500 dark:text-sky-400 mt-0.5">
+                            IFSC: {acc.ifsc_code}
+                          </p>
+                        )}
                       </div>
-                      <button onClick={() => handleUnlink(item.id)} className="text-slate-400 hover:text-red-500">
+                      <button onClick={() => handleUnlink(item.id)} className="text-slate-400 hover:text-red-500 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 text-xs flex justify-between items-baseline font-mono">
-                    <span className="text-slate-400">Live Balance:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
-                      {formatCurrency(acc?.current_balance || '0.00', acc?.currency || cur)}
-                    </span>
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+                    <div className="text-xs flex justify-between items-baseline font-mono">
+                      <span className="text-slate-400 text-[11px]">Live Balance:</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                        {formatCurrency(acc?.current_balance || '0.00', acc?.currency || cur)}
+                      </span>
+                    </div>
+
+                    {acc && (
+                      <button
+                        onClick={() => handleSyncAccount(acc.id)}
+                        disabled={isSyncing}
+                        className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-300 border border-sky-200 dark:border-sky-800 hover:bg-sky-100 dark:hover:bg-sky-900/50 transition-all cursor-pointer"
+                      >
+                        <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                        <span>{isSyncing ? 'Syncing Balance...' : 'Sync Real Account'}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -361,7 +578,7 @@ export const LinkedPage: React.FC = () => {
                         <h3 className="font-bold text-sm text-slate-900 dark:text-white mt-1 font-mono">{item.identifier}</h3>
                         <p className="text-xs text-slate-400 mt-0.5">{item.provider_name}</p>
                       </div>
-                      <button onClick={() => handleUnlink(item.id)} className="text-slate-400 hover:text-red-500">
+                      <button onClick={() => handleUnlink(item.id)} className="text-slate-400 hover:text-red-500 cursor-pointer">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -414,7 +631,7 @@ export const LinkedPage: React.FC = () => {
                       <h3 className="font-bold text-sm text-slate-900 dark:text-white mt-1">{item.provider_name}</h3>
                       <p className="text-xs text-slate-400 font-mono mt-0.5">{item.identifier}</p>
                     </div>
-                    <button onClick={() => handleUnlink(item.id)} className="text-slate-400 hover:text-red-500">
+                    <button onClick={() => handleUnlink(item.id)} className="text-slate-400 hover:text-red-500 cursor-pointer">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -430,81 +647,148 @@ export const LinkedPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal: Link Bank */}
+      {/* Modal: Link Bank (With Country Banking Catalog, IFSC validation, and AES-256 Vault) */}
       {isBankModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+          <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl space-y-4 my-8">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Link Bank Account</h3>
-              <button onClick={() => setIsBankModalOpen(false)} className="text-slate-400 hover:text-white">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-sky-500/10 text-sky-500">
+                  <Building2 className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Link Bank Account</h3>
+                  <p className="text-[11px] text-slate-400">AES-256 Vault Encrypted &amp; Verified Sync</p>
+                </div>
+              </div>
+              <button onClick={() => setIsBankModalOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <form onSubmit={handleLinkBank} className="space-y-3.5 text-xs">
-              <div>
-                <label className="block font-semibold uppercase text-slate-500 mb-1">Bank Name</label>
-                <select
-                  value={bankForm.bankName}
-                  onChange={e => setBankForm({ ...bankForm, bankName: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm"
-                >
-                  <option value="HDFC Bank">HDFC Bank</option>
-                  <option value="State Bank of India (SBI)">State Bank of India (SBI)</option>
-                  <option value="ICICI Bank">ICICI Bank</option>
-                  <option value="Axis Bank">Axis Bank</option>
-                  <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
-                  <option value="Chase Bank">Chase Bank</option>
-                  <option value="Bank of America">Bank of America</option>
-                </select>
-              </div>
 
+            <form onSubmit={handleLinkBank} className="space-y-4 text-xs">
+              {/* Country, State, City, Bank & Branch Selector */}
               <div>
-                <label className="block font-semibold uppercase text-slate-500 mb-1">Account Number</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="501004829104"
-                  value={bankForm.accountNumber}
-                  onChange={e => setBankForm({ ...bankForm, accountNumber: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
+                <BankBranchSelector
+                  initialCountry={activeCountry.code}
+                  initialBankId={selectedBankId}
+                  initialIfsc={bankForm.ifscOrRouting}
+                  onSelect={({ bank, branch, country }) => {
+                    setSelectedCountryName(country.name);
+                    setSelectedBankId(bank.id);
+                    setSelectedBranchCode(branch.code);
+                    setBankForm(prev => ({
+                      ...prev,
+                      country: country.name,
+                      bankName: bank.name,
+                      branchName: branch.branchName,
+                      ifscOrRouting: branch.code,
+                    }));
+                    setIfscFormatValid(true);
+                  }}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              {/* IFSC / Routing Code & Account Number */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold uppercase text-slate-500 mb-1">IFSC / Routing</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold uppercase text-slate-500 dark:text-slate-400">
+                      {activeCountry.codeLabel}
+                    </label>
+                    {ifscFormatValid ? (
+                      <span className="text-[10px] text-emerald-500 font-semibold flex items-center gap-0.5">
+                        <CheckCircle2 className="h-3 w-3" /> Valid
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-amber-500 font-semibold flex items-center gap-0.5">
+                        <AlertCircle className="h-3 w-3" /> Check format
+                      </span>
+                    )}
+                  </div>
                   <input
                     type="text"
-                    placeholder="HDFC0000123"
+                    required
+                    placeholder={activeCountry.codePlaceholder}
                     value={bankForm.ifscOrRouting}
-                    onChange={e => setBankForm({ ...bankForm, ifscOrRouting: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
+                    onChange={e => handleIfscChange(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono uppercase text-sm"
                   />
+                  <p className="text-[10px] text-slate-400 mt-0.5">{activeCountry.codeFormatHelp}</p>
+                </div>
+
+                <div>
+                  <label className="block font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 38192048190"
+                    value={bankForm.accountNumber}
+                    onChange={e => setBankForm({ ...bankForm, accountNumber: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-sm"
+                  />
+                  {bankForm.accountNumber.length > 4 && (
+                    <p className="text-[10px] text-emerald-500 font-mono mt-0.5">
+                      Masked preview: •••• •••• {bankForm.accountNumber.slice(-4)}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Account Type & Initial Balance */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">Account Type</label>
+                  <select
+                    value={bankForm.accountType}
+                    onChange={e => setBankForm({ ...bankForm, accountType: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm"
+                  >
+                    <option value="SAVINGS">Savings Account</option>
+                    <option value="CHECKING">Current / Checking</option>
+                    <option value="SALARY">Salary Account</option>
+                    <option value="CREDIT_CARD">Credit Card Account</option>
+                  </select>
                 </div>
                 <div>
-                  <label className="block font-semibold uppercase text-slate-500 mb-1">Initial Balance ({cur})</label>
+                  <label className="block font-semibold uppercase text-slate-500 dark:text-slate-400 mb-1">Initial Balance ({activeCountry.currency})</label>
                   <input
                     type="number"
                     step="0.01"
                     required
                     value={bankForm.openingBalance}
                     onChange={e => setBankForm({ ...bankForm, openingBalance: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-sm"
                   />
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 text-[11px] leading-relaxed">
-                <ShieldCheck className="h-4 w-4 inline mr-1 text-sky-400" />
-                Auto-growth engine calculates standard 3.5% p.a. quarterly savings interest credit automatically.
+              {/* Next-Level Cryptographic Security Guarantee */}
+              <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-700 dark:text-sky-300 space-y-1.5 text-[11px] leading-relaxed">
+                <div className="flex items-center gap-1.5 font-bold text-sky-600 dark:text-sky-400">
+                  <Shield className="h-4 w-4 shrink-0 text-sky-500" />
+                  Bank-Grade Field Encryption &amp; Anti-Tamper Security
+                </div>
+                <p>
+                  Account numbers and IFSC/routing codes are encrypted at rest using <strong>AES-256-GCM</strong> authenticated encryption. A cryptographic <strong>HMAC-SHA256 integrity seal</strong> protects against database manipulation, and only masked numbers are displayed.
+                </p>
               </div>
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setIsBankModalOpen(false)} className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300">
+                <button
+                  type="button"
+                  onClick={() => setIsBankModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer"
+                >
                   Cancel
                 </button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold">
-                  Connect Bank
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold shadow-md cursor-pointer"
+                >
+                  Connect &amp; Vault Encrypt
                 </button>
               </div>
             </form>

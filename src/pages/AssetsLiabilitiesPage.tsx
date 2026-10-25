@@ -72,9 +72,10 @@ export const AssetsLiabilitiesPage: React.FC = () => {
         monthlyEmi: '',
         notes: '',
       });
+      setMessage('Record saved successfully!');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Failed saving asset/liability'}`);
     }
   };
 
@@ -82,9 +83,10 @@ export const AssetsLiabilitiesPage: React.FC = () => {
     if (!confirm('Remove this record?')) return;
     try {
       await api.deleteAssetLiability(id);
+      setMessage('Record removed successfully!');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Failed deleting record'}`);
     }
   };
 

@@ -71,9 +71,10 @@ export const BillsPage: React.FC = () => {
         accountId: '',
         nextDueDate: new Date().toISOString().split('T')[0],
       });
+      setMessage('Bill scheduled successfully!');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Failed saving bill'}`);
     }
   };
 
@@ -81,9 +82,10 @@ export const BillsPage: React.FC = () => {
     if (!confirm('Remove this recurring bill?')) return;
     try {
       await api.deleteBill(id);
+      setMessage('Bill removed successfully!');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Failed deleting bill'}`);
     }
   };
 

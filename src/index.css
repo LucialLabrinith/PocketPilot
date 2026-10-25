@@ -1,3 +1,89 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* High contrast rich black typography in light theme */
+  html:not(.dark),
+  html[data-theme="light"],
+  body:not(.dark),
+  body[data-theme="light"] {
+    color: #020617 !important;
+    background-color: #f8fafc !important;
+  }
+
+  html:not(.dark) h1,
+  html:not(.dark) h2,
+  html:not(.dark) h3,
+  html:not(.dark) h4,
+  html:not(.dark) h5,
+  html:not(.dark) h6 {
+    color: #000000 !important;
+    font-weight: 800;
+  }
+
+  html:not(.dark) p:not(.text-white):not([class*="text-emerald"]):not([class*="text-sky"]):not([class*="text-blue"]):not([class*="text-rose"]),
+  html:not(.dark) label,
+  html:not(.dark) th,
+  html:not(.dark) td:not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-blue"]):not([class*="text-amber"]) {
+    color: #020617 !important;
+  }
+
+  html:not(.dark) .text-slate-400,
+  html:not(.dark) .text-slate-500 {
+    color: #1e293b !important;
+    font-weight: 500;
+  }
+
+  html:not(.dark) .text-slate-600,
+  html:not(.dark) .text-slate-700,
+  html:not(.dark) .text-slate-800,
+  html:not(.dark) .text-slate-900 {
+    color: #000000 !important;
+    font-weight: 600;
+  }
+
+  html:not(.dark) input,
+  html:not(.dark) select,
+  html:not(.dark) textarea {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-color: #94a3b8 !important;
+    font-weight: 600;
+  }
+
+  html:not(.dark) input::placeholder,
+  html:not(.dark) textarea::placeholder {
+    color: #475569 !important;
+  }
+
+  body {
+    @apply selection:bg-cyan-500 selection:text-white transition-colors duration-200;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.25);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.45);
+  }
+}

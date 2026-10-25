@@ -28,9 +28,11 @@ export const ExpensesPage: React.FC = () => {
     notes: '',
     payee: '',
   });
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const loadData = async () => {
     setLoading(true);
+    setErrorMessage(null);
     try {
       const [txs, accs, cats] = await Promise.all([
         api.getTransactions({ type: 'EXPENSE' }),
@@ -76,7 +78,7 @@ export const ExpensesPage: React.FC = () => {
       });
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setErrorMessage(err.message || 'Failed recording expense');
     }
   };
 
@@ -116,6 +118,13 @@ export const ExpensesPage: React.FC = () => {
           {t('addTransaction')}
         </button>
       </div>
+
+      {errorMessage && (
+        <div className="p-3.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-xs text-rose-300 flex items-center justify-between">
+          <span>{errorMessage}</span>
+          <button onClick={() => setErrorMessage(null)} className="text-rose-400 hover:text-white cursor-pointer">✕</button>
+        </div>
+      )}
 
       {/* Needs vs Wants Breakdown Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">

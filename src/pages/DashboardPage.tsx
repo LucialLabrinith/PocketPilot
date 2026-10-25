@@ -14,16 +14,29 @@ import {
   AlertCircle,
   ArrowRight,
   ArrowDownLeft,
-  ArrowUpRight
+  ArrowUpRight,
+  Zap,
+  Coins,
+  TrendingUp,
+  Landmark,
+  ShieldCheck
 } from 'lucide-react';
 import { PageId } from '../components/Navigation';
+import { ConnectBankModal } from '../components/ConnectBankModal';
 
 interface DashboardPageProps {
   onNavigate: (page: PageId) => void;
   onOpenDesktopSimulator: () => void;
+  onOpenUpiPay?: () => void;
+  onOpenQrScanner?: () => void;
 }
 
-export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onOpenDesktopSimulator }) => {
+export const DashboardPage: React.FC<DashboardPageProps> = ({
+  onNavigate,
+  onOpenDesktopSimulator,
+  onOpenUpiPay,
+  onOpenQrScanner,
+}) => {
   const { user } = useAuth();
   const { t, formatCurrency, formatDigits, formatDate } = useLanguage();
   const [summary, setSummary] = useState<FinancialSummary | null>(null);
@@ -32,6 +45,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onOpen
   const [budget, setBudget] = useState<MonthlyBudget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConnectBankModalOpen, setIsConnectBankModalOpen] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -58,54 +72,174 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onOpen
     loadData();
   }, []);
 
-  const cur = summary?.currency || user?.currency || 'USD';
+  const cur = summary?.currency || user?.currency || 'INR';
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-3">
         <RefreshCw className="h-8 w-8 text-sky-500 animate-spin" />
-        <p className="text-sm text-slate-500 dark:text-slate-400">{t('loading')}</p>
+        <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('loading')}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Top Banner / Welcome */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-sky-900/40 via-indigo-900/30 to-slate-900 border border-sky-500/20 shadow-lg text-white">
+      {/* Top Banner / Welcome with high contrast in light & dark */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-sky-50 via-indigo-50/70 to-white dark:from-sky-950/40 dark:via-indigo-950/30 dark:to-slate-900 border border-slate-200 dark:border-sky-500/20 shadow-sm transition-colors text-slate-900 dark:text-white">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-500/20 text-sky-300">
+            <span className="text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-sky-500/10 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-500/20">
               {t('overviewTitle')}
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
               {t('monthLabel')}: {summary?.currentMonth || t('currentMonth')}
             </span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-white mt-1">
+          <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white mt-1">
             {t('welcomeBack', { name: user?.fullName || 'User' })}
           </h1>
-          <p className="text-xs text-slate-300 mt-1 max-w-xl">
+          <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-xl font-medium">
             {t('dashboardSubtitle')}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Prominent Scanner Button */}
+          {(onOpenQrScanner || onOpenUpiPay) && (
+            <button
+              onClick={onOpenQrScanner || onOpenUpiPay}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-md shadow-emerald-600/20 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            >
+              <span className="text-sm">📷</span>
+              <span>Scan Any QR</span>
+            </button>
+          )}
+
+          {onOpenUpiPay && (
+            <button
+              onClick={onOpenUpiPay}
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-slate-950 text-xs font-black shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            >
+              <Zap className="h-4 w-4 fill-slate-950" />
+              <span>⚡ UPI Super Pay</span>
+            </button>
+          )}
+
           <button
             onClick={() => onNavigate('transactions')}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow transition-all cursor-pointer"
           >
             <PlusCircle className="h-4 w-4" />
             {t('addTransaction')}
           </button>
           <button
             onClick={onOpenDesktopSimulator}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-all cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold border border-slate-300 dark:border-slate-700 transition-all cursor-pointer"
           >
-            <RefreshCw className="h-4 w-4 text-sky-400" />
+            <RefreshCw className="h-4 w-4 text-sky-600 dark:text-sky-400" />
             {t('syncDesktop')}
           </button>
         </div>
+      </div>
+
+      {/* IN-APP SETUP ONBOARDING CALLOUT IF ZERO ACCOUNTS */}
+      {accounts.length === 0 && (
+        <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-sky-500/10 to-indigo-500/10 border-2 border-dashed border-sky-500/40 dark:border-sky-400/30 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center font-black shadow-md shrink-0">
+              <Landmark className="h-6 w-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                  Step 2: Complete In-App Setup
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  {user?.email}
+                </span>
+              </div>
+              <h2 className="text-lg font-black text-slate-950 dark:text-white mt-1.5">
+                Connect Your Bank Account to Get Started
+              </h2>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 max-w-xl leading-relaxed">
+                Your Google login is verified, but no bank account is connected yet. PocketPilot does not show fake money. Connect your bank account (SBI, HDFC, ICICI, Axis, Kotak, or any custom bank) to set your verified opening balance, configure your UPI ID &amp; PIN, and enable balance tracking.
+              </p>
+            </div>
+          </div>
+          <div className="shrink-0 flex items-center gap-2">
+            <button
+              onClick={() => setIsConnectBankModalOpen(true)}
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-black text-xs shadow-lg shadow-sky-600/30 flex items-center gap-2 cursor-pointer transition-all active:scale-95 hover:scale-105"
+            >
+              <Zap className="h-4 w-4 fill-white" />
+              <span>Connect Bank Account</span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* QUICK FEATURE LAUNCHPAD */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {(onOpenQrScanner || onOpenUpiPay) && (
+          <button
+            onClick={onOpenQrScanner || onOpenUpiPay}
+            className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/5 hover:from-emerald-500/20 border border-emerald-500/25 text-left transition-all cursor-pointer group shadow-2xs"
+          >
+            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 w-fit mb-2 group-hover:scale-110 transition-transform">
+              <span className="text-base">📷</span>
+            </div>
+            <div className="font-extrabold text-xs text-slate-950 dark:text-white">Scan Any QR</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400">Camera Viewfinder &amp; File Scan</div>
+          </button>
+        )}
+
+        {onOpenUpiPay && (
+          <button
+            onClick={onOpenUpiPay}
+            className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 hover:from-amber-500/20 border border-amber-500/25 text-left transition-all cursor-pointer group shadow-2xs"
+          >
+            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 w-fit mb-2 group-hover:scale-110 transition-transform">
+              <Zap className="h-4 w-4" />
+            </div>
+            <div className="font-extrabold text-xs text-slate-950 dark:text-white">UPI Super Pay</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400">Phone, VPA, Bank, Self &amp; Receive</div>
+          </button>
+        )}
+
+        <button
+          onClick={() => onNavigate('investments')}
+          className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/5 hover:from-emerald-500/20 border border-emerald-500/25 text-left transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 w-fit mb-2 group-hover:scale-110 transition-transform">
+            <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="font-bold text-xs text-slate-900 dark:text-white">Trading &amp; FDs</div>
+          <div className="text-[10px] text-slate-400">Zerodha, Groww, Stocks &amp; FDs</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('investments')}
+          className="p-3.5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-indigo-500/5 hover:from-purple-500/20 border border-purple-500/25 text-left transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-400 w-fit mb-2 group-hover:scale-110 transition-transform">
+            <Coins className="h-4 w-4" />
+          </div>
+          <div className="font-bold text-xs text-slate-900 dark:text-white">PocketMoney</div>
+          <div className="text-[10px] text-slate-400">Daily Allowance &amp; 1-Tap Debit</div>
+        </button>
+
+        <button
+          onClick={() => onNavigate('accounts')}
+          className="p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/10 to-blue-500/5 hover:from-sky-500/20 border border-sky-500/25 text-left transition-all cursor-pointer group"
+        >
+          <div className="p-2 rounded-xl bg-sky-500/20 text-sky-600 dark:text-sky-400 w-fit mb-2 group-hover:scale-110 transition-transform">
+            <Landmark className="h-4 w-4" />
+          </div>
+          <div className="font-bold text-xs text-slate-900 dark:text-white">Bank Accounts</div>
+          <div className="text-[10px] text-slate-400">Primary Receiving &amp; AES Vault</div>
+        </button>
       </div>
 
       {error && (
@@ -206,16 +340,25 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onOpen
               <div className="inline-flex p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
                 <Wallet className="h-6 w-6" />
               </div>
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('noAccountsYet')}</p>
+              <p className="text-sm font-bold text-slate-900 dark:text-white">No Bank Account Connected</p>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                {t('createAccountPrompt')}
+                Connect your bank account to start tracking your actual balance, view transactions, and send UPI payments.
               </p>
-              <button
-                onClick={() => onNavigate('accounts')}
-                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold cursor-pointer shadow"
-              >
-                {t('addAccountBtn')}
-              </button>
+              <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+                <button
+                  onClick={() => setIsConnectBankModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white text-xs font-bold cursor-pointer shadow-md flex items-center gap-1.5 active:scale-95 transition-all"
+                >
+                  <Zap className="h-3.5 w-3.5 fill-white" />
+                  <span>Connect Bank Account</span>
+                </button>
+                <button
+                  onClick={() => onNavigate('accounts')}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold cursor-pointer border border-slate-200 dark:border-slate-700"
+                >
+                  {t('addAccountBtn')}
+                </button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -391,6 +534,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate, onOpen
           </div>
         )}
       </div>
+
+      {/* In-App Bank Setup & Linking Modal */}
+      <ConnectBankModal
+        isOpen={isConnectBankModalOpen}
+        onClose={() => setIsConnectBankModalOpen(false)}
+        onSuccess={loadData}
+      />
     </div>
   );
 };

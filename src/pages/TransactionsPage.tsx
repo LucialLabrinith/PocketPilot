@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { api } from '../services/api';
 import { Account, Category, Transaction } from '../types';
+import { PageId } from '../components/Navigation';
 import {
   Receipt,
   PlusCircle,
@@ -20,10 +21,22 @@ import {
   AlertCircle,
   X,
   FileSpreadsheet,
-  Calendar
+  Calendar,
+  LayoutDashboard,
+  Wallet,
+  Smartphone,
+  PieChart,
+  Scale,
+  FileText
 } from 'lucide-react';
+import { BankSwitchComplianceModal } from '../components/BankSwitchComplianceModal';
+import { LegalTransferCertificate } from '../types';
 
-export const TransactionsPage: React.FC = () => {
+interface TransactionsPageProps {
+  onNavigate?: (page: PageId) => void;
+}
+
+export const TransactionsPage: React.FC<TransactionsPageProps> = ({ onNavigate }) => {
   const { user } = useAuth();
   const { t, formatCurrency, formatDate, formatDigits } = useLanguage();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -47,6 +60,16 @@ export const TransactionsPage: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [importCsvText, setImportCsvText] = useState('');
   const [importAccountId, setImportAccountId] = useState('');
+  const [viewingCert, setViewingCert] = useState<LegalTransferCertificate | null>(null);
+
+  const handleViewLegalCertificate = async (txId: string) => {
+    try {
+      const res = await api.getLegalCertificate(txId);
+      setViewingCert(res.data);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Could not load legal certificate');
+    }
+  };
 
   // Form State
   const [txForm, setTxForm] = useState({
@@ -208,6 +231,71 @@ export const TransactionsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Cross-Page Navigation */}
+      {onNavigate && (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+          <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider shrink-0 flex items-center gap-1">
+            Navigate:
+          </span>
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <LayoutDashboard className="h-3.5 w-3.5 text-sky-500" />
+            Dashboard
+          </button>
+          <button
+            onClick={() => onNavigate('accounts')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <Wallet className="h-3.5 w-3.5 text-blue-500" />
+            Accounts &amp; Cards
+          </button>
+          <button
+            onClick={() => onNavigate('linked')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <Smartphone className="h-3.5 w-3.5 text-sky-500" />
+            Linked Banking
+          </button>
+          <button
+            onClick={() => onNavigate('transactions')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold shrink-0 shadow-2xs cursor-pointer"
+          >
+            <Receipt className="h-3.5 w-3.5 text-amber-500" />
+            Transactions
+          </button>
+          <button
+            onClick={() => onNavigate('income')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <ArrowDownLeft className="h-3.5 w-3.5 text-emerald-500" />
+            Income
+          </button>
+          <button
+            onClick={() => onNavigate('expenses')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <ArrowUpRight className="h-3.5 w-3.5 text-rose-500" />
+            Expenses
+          </button>
+          <button
+            onClick={() => onNavigate('budget')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <PieChart className="h-3.5 w-3.5 text-indigo-500" />
+            Budgets
+          </button>
+          <button
+            onClick={() => onNavigate('networth')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-sky-500 hover:text-sky-500 transition-colors shrink-0 shadow-2xs font-medium cursor-pointer"
+          >
+            <Scale className="h-3.5 w-3.5 text-purple-500" />
+            Net Worth
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -413,9 +501,21 @@ export const TransactionsPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-slate-900 dark:text-slate-100">
-                        <div className="font-semibold">{tx.payee || '—'}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{tx.payee || '—'}</span>
+                          {tx.npci_rrn && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20" title={`NPCI RRN: ${tx.npci_rrn} | Pinnacle Ref: ${tx.cbs_pinnacle_ref || 'N/A'}`}>
+                              NPCI {tx.npci_rrn.slice(0, 4)}...{tx.npci_rrn.slice(-4)}
+                            </span>
+                          )}
+                        </div>
                         {tx.notes && (
                           <div className="text-[10px] text-slate-400 line-clamp-1">{tx.notes}</div>
+                        )}
+                        {tx.transfer_fee !== undefined && (
+                          <div className="text-[9px] text-emerald-600 dark:text-emerald-400/80 font-mono flex items-center gap-1 mt-0.5">
+                            <span>RBI Sec 10(2) Legal Fee: ₹{Number(tx.transfer_fee).toFixed(2)}</span>
+                          </div>
                         )}
                       </td>
                       <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
@@ -456,6 +556,13 @@ export const TransactionsPage: React.FC = () => {
                       </td>
                       <td className="py-3 px-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleViewLegalCertificate(tx.id)}
+                            className="p-1 rounded text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 cursor-pointer"
+                            title="View Legal NPCI & Pinnacle Transfer Certificate"
+                          >
+                            <FileText className="h-3.5 w-3.5" />
+                          </button>
                           <button
                             onClick={() => openEditModal(tx)}
                             className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800 cursor-pointer"
@@ -739,6 +846,15 @@ export const TransactionsPage: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Bank Switch & Legal Certificate Compliance Modal */}
+      {viewingCert && (
+        <BankSwitchComplianceModal
+          isOpen={Boolean(viewingCert)}
+          onClose={() => setViewingCert(null)}
+          selectedCertificate={viewingCert}
+        />
       )}
     </div>
   );

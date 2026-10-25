@@ -25,7 +25,10 @@ import {
   Menu,
   X,
   ShieldCheck,
-  Globe
+  Globe,
+  QrCode,
+  Zap,
+  Camera
 } from 'lucide-react';
 
 export type PageId =
@@ -49,12 +52,18 @@ interface NavigationProps {
   currentPage: PageId;
   onNavigate: (page: PageId) => void;
   onOpenDesktopSimulator: () => void;
+  onOpenQrScanner?: () => void;
+  onOpenUpiPay?: () => void;
+  onOpenBankSwitch?: () => void;
 }
 
 export const Navigation: React.FC<NavigationProps> = ({
   currentPage,
   onNavigate,
   onOpenDesktopSimulator,
+  onOpenQrScanner,
+  onOpenUpiPay,
+  onOpenBankSwitch,
 }) => {
   const { user, logout, theme, toggleTheme } = useAuth();
   const { t, language, setLanguage } = useLanguage();
@@ -114,7 +123,31 @@ export const Navigation: React.FC<NavigationProps> = ({
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Quick Mobile Scan QR Button */}
+          {onOpenQrScanner && (
+            <button
+              onClick={onOpenQrScanner}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-xs cursor-pointer active:scale-95"
+              title="Scan any UPI QR"
+            >
+              <span>📷</span>
+              <span>Scan</span>
+            </button>
+          )}
+
+          {/* Quick Mobile UPI Pay Button */}
+          {onOpenUpiPay && (
+            <button
+              onClick={onOpenUpiPay}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs shadow-xs cursor-pointer active:scale-95"
+              title="UPI Super Pay"
+            >
+              <Zap className="h-3 w-3 fill-slate-950" />
+              <span>Pay</span>
+            </button>
+          )}
+
           {/* Mobile Language Switcher */}
           <select
             value={language}
@@ -130,7 +163,7 @@ export const Navigation: React.FC<NavigationProps> = ({
           {/* Theme toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             title={t('toggleTheme')}
           >
             {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-indigo-600" />}
@@ -138,7 +171,7 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -167,6 +200,48 @@ export const Navigation: React.FC<NavigationProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Quick Action Buttons in Sidebar */}
+        <div className="p-3 border-b border-slate-800/80 grid grid-cols-2 gap-2">
+          {onOpenQrScanner && (
+            <button
+              type="button"
+              onClick={() => { onOpenQrScanner(); setMobileMenuOpen(false); }}
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span className="text-sm">📷</span>
+              <span>Scan QR</span>
+            </button>
+          )}
+
+          {onOpenUpiPay && (
+            <button
+              type="button"
+              onClick={() => { onOpenUpiPay(); setMobileMenuOpen(false); }}
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-slate-950 font-black text-xs shadow-md shadow-amber-500/20 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Zap className="h-3.5 w-3.5 fill-slate-950" />
+              <span>UPI Pay</span>
+            </button>
+          )}
+        </div>
+
+        {/* Pinnacle CBS & NPCI Switch Legal Gateway Button */}
+        {onOpenBankSwitch && (
+          <div className="px-3 pb-2 border-b border-slate-800/80">
+            <button
+              type="button"
+              onClick={() => { onOpenBankSwitch(); setMobileMenuOpen(false); }}
+              className="w-full flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-indigo-950/60 hover:bg-indigo-900/60 border border-indigo-500/30 text-indigo-300 text-xs font-bold cursor-pointer transition-colors"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Pinnacle &amp; NPCI Switch</span>
+              </div>
+              <span className="text-[10px] text-emerald-400 font-mono font-bold">ONLINE</span>
+            </button>
+          </div>
+        )}
 
         {/* Navigation Sections */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin scrollbar-thumb-slate-800">

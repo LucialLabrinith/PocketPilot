@@ -69,7 +69,7 @@ export const CategoriesPage: React.FC = () => {
       });
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Failed creating category'}`);
     }
   };
 
@@ -80,7 +80,7 @@ export const CategoriesPage: React.FC = () => {
       setMessage('Category deleted');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Failed deleting category'}`);
     }
   };
 

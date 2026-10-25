@@ -7,6 +7,7 @@ import {
   PieChart,
   Save,
   CheckCircle2,
+  AlertCircle,
   Home,
   ShoppingBag,
   Shield,
@@ -22,6 +23,7 @@ export const BudgetsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Form State
   const [incomeTarget, setIncomeTarget] = useState('3000.00');
@@ -58,6 +60,7 @@ export const BudgetsPage: React.FC = () => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
+    setErrorMessage(null);
     try {
       const updated = await api.saveBudget({
         monthlyIncomeTarget: incomeTarget,
@@ -68,7 +71,7 @@ export const BudgetsPage: React.FC = () => {
       setBudget(updated.data);
       setMessage(t('save') + '!');
     } catch (err: any) {
-      alert(err.message);
+      setErrorMessage(err.message || 'Failed saving budget');
     } finally {
       setSaving(false);
     }
@@ -117,6 +120,13 @@ export const BudgetsPage: React.FC = () => {
         <div className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-300 flex items-center gap-2">
           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
           <span>{message}</span>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-3.5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-xs text-rose-300 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-rose-400" />
+          <span>{errorMessage}</span>
         </div>
       )}
 

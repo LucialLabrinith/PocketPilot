@@ -35,8 +35,8 @@ let activeSmtpSettings: SmtpSettings = {
   secure: process.env.SMTP_SECURE === 'true' || (process.env.SMTP_PORT ? process.env.SMTP_PORT === '465' : true),
   user: process.env.GMAIL_USER || process.env.SMTP_USER || '',
   pass: process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS || '',
-  fromEmail: process.env.SMTP_FROM || process.env.GMAIL_USER || 'security@pocketpilot.app',
-  fromName: process.env.SMTP_FROM_NAME || 'PocketPilot Security',
+  fromEmail: process.env.SMTP_FROM || process.env.GMAIL_USER || 'pocketpilot@gmail.com',
+  fromName: process.env.SMTP_FROM_NAME || 'PocketPilot Security (pocketpilot@gmail.com)',
 };
 
 let lastSmtpError: string | null = null;

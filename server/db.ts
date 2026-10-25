@@ -9,6 +9,9 @@ export interface UserRecord {
   full_name: string;
   currency: string;
   is_verified: boolean;
+  google_avatar?: string;
+  pocket_money_daily_limit?: string;
+  pocket_money_source_account_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -43,11 +46,24 @@ export interface AccountRecord {
   current_balance: string;
   currency: string;
   account_number?: string;
+  account_number_encrypted?: string;
+  account_number_masked?: string;
+  country?: string;
+  ifsc_code?: string;
+  ifsc_code_encrypted?: string;
+  branch_name?: string;
+  routing_number?: string;
   institution?: string;
   is_reconciled: boolean;
   last_reconciled_at?: string;
   is_linked?: boolean;
   linked_provider?: string;
+  last_synced_at?: string;
+  sync_status?: 'SYNCED' | 'PENDING' | 'ERROR';
+  security_seal?: string;
+  is_primary_receiving?: boolean;
+  upi_vpa?: string;
+  upi_pin?: string;
   created_at: string;
   updated_at: string;
 }
@@ -71,11 +87,23 @@ export interface TransactionRecord {
   to_account_id?: string | null;
   category_id?: string | null;
   type: 'INCOME' | 'EXPENSE' | 'TRANSFER' | 'REFUND';
+  classification?: 'NEED' | 'WANT' | 'SAVINGS' | 'NONE';
+  payment_method?: 'UPI_QR' | 'UPI_CONTACT' | 'UPI_VPA' | 'BANK_TRANSFER' | 'SELF' | 'CARD' | 'CASH';
+  payee_identifier?: string;
   amount: string;
   transaction_date: string;
   notes?: string;
   payee?: string;
   is_reconciled: boolean;
+  npci_rrn?: string;
+  cbs_pinnacle_ref?: string;
+  bank_switch_auth?: string;
+  transferree_legal_name?: string;
+  transferree_vpa?: string;
+  transfer_fee?: string;
+  transfer_fee_gst?: string;
+  switch_route?: string;
+  legal_compliance_seal?: string;
   created_at: string;
   updated_at: string;
 }
@@ -147,6 +175,14 @@ export interface InvestmentRecord {
   sip_monthly_amount?: string | null;
   is_linked?: boolean;
   linked_provider?: string;
+  broker_app?: string;
+  stock_symbol?: string;
+  quantity?: number;
+  buy_price?: string;
+  current_price?: string;
+  pnl?: string;
+  fd_tenure_months?: number;
+  fd_maturity_amount?: string;
   auto_growth_enabled?: boolean;
   notes?: string;
   created_at: string;

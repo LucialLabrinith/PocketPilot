@@ -75,7 +75,7 @@ export const SavingsGoalsPage: React.FC = () => {
       setMessage(t('save') + '!');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Operation failed'}`);
     }
   };
 
@@ -90,7 +90,7 @@ export const SavingsGoalsPage: React.FC = () => {
       setMessage(t('confirm') + '!');
       loadData();
     } catch (err: any) {
-      alert(err.message);
+      setMessage(`Error: ${err.message || 'Contribution failed'}`);
     }
   };
 
