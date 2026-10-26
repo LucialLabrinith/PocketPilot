@@ -35,6 +35,11 @@ const MainLayout: React.FC = () => {
   const [isUpiPayModalOpen, setIsUpiPayModalOpen] = useState(false);
   const [isBankSwitchModalOpen, setIsBankSwitchModalOpen] = useState(false);
   const [upiInitialTab, setUpiInitialTab] = useState<'QR' | 'CONTACT' | 'UPI_ID' | 'BANK_TRANSFER' | 'SELF' | 'RECEIVE'>('QR');
+  const [dataVersion, setDataVersion] = useState(0);
+
+  const handlePaymentSuccess = () => {
+    setDataVersion(v => v + 1);
+  };
 
   const handleOpenQrScanner = () => {
     setUpiInitialTab('QR');
@@ -181,15 +186,22 @@ const MainLayout: React.FC = () => {
 
           {currentPage === 'dashboard' && (
             <DashboardPage
+              key={dataVersion}
               onNavigate={page => setCurrentPage(page)}
               onOpenDesktopSimulator={() => setIsDesktopModalOpen(true)}
               onOpenUpiPay={() => handleOpenUpiPay('UPI_ID')}
               onOpenQrScanner={handleOpenQrScanner}
             />
           )}
-          {currentPage === 'accounts' && <AccountsPage onNavigate={page => setCurrentPage(page)} />}
-          {currentPage === 'linked' && <LinkedPage onNavigate={page => setCurrentPage(page)} />}
-          {currentPage === 'transactions' && <TransactionsPage onNavigate={page => setCurrentPage(page)} />}
+          {currentPage === 'accounts' && (
+            <AccountsPage
+              key={dataVersion}
+              onNavigate={page => setCurrentPage(page)}
+              onOpenUpiPay={() => handleOpenUpiPay('UPI_ID')}
+            />
+          )}
+          {currentPage === 'linked' && <LinkedPage key={dataVersion} onNavigate={page => setCurrentPage(page)} />}
+          {currentPage === 'transactions' && <TransactionsPage key={dataVersion} onNavigate={page => setCurrentPage(page)} />}
           {currentPage === 'income' && <IncomePage />}
           {currentPage === 'expenses' && <ExpensesPage />}
           {currentPage === 'categories' && <CategoriesPage />}
@@ -198,6 +210,7 @@ const MainLayout: React.FC = () => {
           {currentPage === 'bills' && <BillsPage />}
           {currentPage === 'investments' && (
             <InvestmentsPage
+              key={dataVersion}
               onNavigate={page => setCurrentPage(page)}
               onOpenUpiPay={() => handleOpenUpiPay('UPI_ID')}
             />
@@ -233,9 +246,7 @@ const MainLayout: React.FC = () => {
         isOpen={isUpiPayModalOpen}
         defaultMode={upiInitialTab}
         onClose={() => setIsUpiPayModalOpen(false)}
-        onPaymentSuccess={() => {
-          // Trigger reload
-        }}
+        onPaymentSuccess={handlePaymentSuccess}
       />
 
       {/* Desktop Client Simulator Modal */}

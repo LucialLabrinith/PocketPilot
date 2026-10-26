@@ -7,11 +7,39 @@ import {
   signOut,
   User as FirebaseUser
 } from 'firebase/auth';
-import firebaseConfig from '../../firebase-applet-config.json';
+// Firebase configuration safely retrieved from client environment variables (VITE_FIREBASE_*)
+const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : ({} as Record<string, string>);
 
-// Reuse existing app instance if already initialized
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
+const resolvedApiKey = env.VITE_FIREBASE_API_KEY || '';
+const resolvedAuthDomain = env.VITE_FIREBASE_AUTH_DOMAIN || '';
+const resolvedProjectId = env.VITE_FIREBASE_PROJECT_ID || '';
+const resolvedStorageBucket = env.VITE_FIREBASE_STORAGE_BUCKET || '';
+const resolvedMessagingSenderId = env.VITE_FIREBASE_MESSAGING_SENDER_ID || '';
+const resolvedAppId = env.VITE_FIREBASE_APP_ID || '';
+
+const resolvedConfig = {
+  apiKey: resolvedApiKey,
+  authDomain: resolvedAuthDomain,
+  projectId: resolvedProjectId,
+  storageBucket: resolvedStorageBucket,
+  messagingSenderId: resolvedMessagingSenderId,
+  appId: resolvedAppId,
+};
+
+// Safely initialize Firebase app if apiKey is provided
+let appInstance: any = null;
+let authInstance: any = null;
+
+try {
+  if (resolvedApiKey) {
+    appInstance = getApps().length === 0 ? initializeApp(resolvedConfig) : getApp();
+    authInstance = getAuth(appInstance);
+  }
+} catch (initErr) {
+  console.warn('[GOOGLE AUTH] Firebase auth initialization notice:', initErr);
+}
+
+export const auth = authInstance;
 
 export const SCOPES = [
   'https://www.googleapis.com/auth/userinfo.profile',
@@ -35,6 +63,10 @@ export const initAuth = (
   onAuthSuccess?: (user: FirebaseUser, token: string) => void,
   onAuthFailure?: () => void
 ) => {
+  if (!auth) {
+    if (onAuthFailure) onAuthFailure();
+    return () => {};
+  }
   return onAuthStateChanged(auth, async (user: FirebaseUser | null) => {
     if (user) {
       if (cachedAccessToken) {
@@ -60,6 +92,9 @@ export const googleSignIn = async (): Promise<{
   fullName: string;
   photoURL?: string;
 } | null> => {
+  if (!auth) {
+    throw new Error('Google Sign-In direct selector available.');
+  }
   try {
     isSigningIn = true;
     const result = await signInWithPopup(auth, provider);
@@ -95,7 +130,9 @@ export const setCachedAccessToken = (token: string | null) => {
 
 export const logoutGoogle = async () => {
   try {
-    await signOut(auth);
+    if (auth) {
+      await signOut(auth);
+    }
   } catch (err) {
     console.warn('[GOOGLE AUTH] Sign out error:', err);
   }

@@ -1025,6 +1025,9 @@ app.post('/api/accounts/:id/sync', authenticate, (req, res) => {
     let computedBalance = parseFloat(account.opening_balance || '0');
     const accountTxs = dbStore.db.transactions.filter(t => t.user_id === user.id);
     for (const t of accountTxs) {
+      if (t.notes?.includes('Initial verified balance') || t.payee?.includes('Opening Balance Sync')) {
+        continue;
+      }
       const amt = parseFloat(t.amount || '0');
       if (t.account_id === account.id) {
         if (t.type === 'INCOME' || t.type === 'REFUND') computedBalance += amt;
@@ -2440,6 +2443,7 @@ app.post('/api/upi/pay', authenticate, (req, res) => {
     const user = (req as any).user;
     const {
       payingAccountId,
+      toAccountId,
       amount,
       payee,
       payeeType = 'UPI_ID',
@@ -2477,14 +2481,32 @@ app.post('/api/upi/pay', authenticate, (req, res) => {
       });
     }
 
+    const isSelfTransfer = payeeType === 'SELF' && Boolean(toAccountId);
+    const targetAccount = isSelfTransfer
+      ? dbStore.db.accounts.find(a => a.id === toAccountId && a.user_id === user.id)
+      : null;
+
+    if (isSelfTransfer && !targetAccount) {
+      return res.status(404).json({ success: false, message: 'Destination self-transfer bank account not found.' });
+    }
+
     const cleanAmount = (Math.round((numAmount + Number.EPSILON) * 100) / 100).toFixed(2);
-    const cleanPayee = (payee || 'UPI Merchant').trim();
-    const cleanPurpose = (purpose || 'UPI Transfer').trim();
+    const cleanPayee = (isSelfTransfer && targetAccount ? `Self: ${targetAccount.name}` : (payee || 'UPI Merchant')).trim();
+    const cleanPurpose = (purpose || (isSelfTransfer ? 'Self Account Transfer' : 'UPI Transfer')).trim();
     const targetClassification = ['NEED', 'WANT', 'SAVINGS'].includes(classification) ? classification : 'WANT';
     const now = new Date().toISOString();
 
     // 1. Legalize Transferree via NPCI Beneficiary Name Inquiry (BNI)
-    const transferreeIdentity = verifyTransferreeIdentity(payeeIdentifier || cleanPayee);
+    const transferreeIdentity = isSelfTransfer && targetAccount
+      ? {
+          legalName: `${user.full_name || 'Account Holder'} (${targetAccount.institution || 'Self Account'})`,
+          verified: true,
+          bank: targetAccount.institution || 'Self Bank',
+          vpa: targetAccount.upi_vpa || `${(user.email || 'user').split('@')[0]}@bank`,
+          type: 'SELF' as any
+        }
+      : verifyTransferreeIdentity(payeeIdentifier || cleanPayee);
+
     const legalTransferreeName = transferreeIdentity.legalName || cleanPayee;
 
     // 2. Legalize Transfer Fee & Interchange ("tranfee")
@@ -2525,15 +2547,18 @@ app.post('/api/upi/pay', authenticate, (req, res) => {
       id: crypto.randomUUID(),
       user_id: user.id,
       account_id: account.id,
-      type: 'EXPENSE',
-      category_id: matchedCategory ? matchedCategory.id : null,
+      to_account_id: targetAccount ? targetAccount.id : null,
+      type: targetAccount ? 'TRANSFER' : 'EXPENSE',
+      category_id: targetAccount ? null : (matchedCategory ? matchedCategory.id : null),
       classification: targetClassification,
       payment_method: paymentMethod,
-      payee_identifier: payeeIdentifier || undefined,
+      payee_identifier: payeeIdentifier || (targetAccount?.account_number_masked || undefined),
       amount: cleanAmount,
       transaction_date: now.split('T')[0],
       payee: cleanPayee,
-      notes: `${cleanPurpose} • Paid from ${account.name} via UPI (${targetClassification}) [NPCI RRN: ${npciRrn}]`,
+      notes: targetAccount
+        ? `${cleanPurpose} • Transferred from ${account.name} to ${targetAccount.name} [NPCI RRN: ${npciRrn}]`
+        : `${cleanPurpose} • Paid from ${account.name} via UPI (${targetClassification}) [NPCI RRN: ${npciRrn}]`,
       is_reconciled: true,
       npci_rrn: npciRrn,
       cbs_pinnacle_ref: cbsPinnacleRef,
@@ -2551,6 +2576,11 @@ app.post('/api/upi/pay', authenticate, (req, res) => {
     dbStore.db.transactions.push(newTx);
     dbStore.recalculateAccountBalance(account.id, user.id);
     account.security_seal = generateSecuritySeal(account);
+
+    if (targetAccount) {
+      dbStore.recalculateAccountBalance(targetAccount.id, user.id);
+      targetAccount.security_seal = generateSecuritySeal(targetAccount);
+    }
 
     dbStore.db.sync_audit_logs.push({
       id: crypto.randomUUID(),
@@ -2599,6 +2629,8 @@ app.post('/api/upi/pay', authenticate, (req, res) => {
         purpose: cleanPurpose,
         payingBank: account.name,
         remainingBalance: account.current_balance,
+        creditedBank: targetAccount?.name,
+        creditedBalance: targetAccount?.current_balance,
         npciRrn,
         cbsPinnacleRef,
         bankSwitchAuth,

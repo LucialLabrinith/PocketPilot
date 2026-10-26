@@ -40,9 +40,10 @@ import { BankBranchSelector } from '../components/BankBranchSelector';
 
 interface AccountsPageProps {
   onNavigate?: (page: PageId) => void;
+  onOpenUpiPay?: () => void;
 }
 
-export const AccountsPage: React.FC<AccountsPageProps> = ({ onNavigate }) => {
+export const AccountsPage: React.FC<AccountsPageProps> = ({ onNavigate, onOpenUpiPay }) => {
   const { user } = useAuth();
   const { t, formatCurrency, formatDigits } = useLanguage();
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -566,15 +567,28 @@ export const AccountsPage: React.FC<AccountsPageProps> = ({ onNavigate }) => {
 
                   {/* Sync & Reconcile Controls */}
                   <div className="flex items-center justify-between gap-2 pt-1 text-[11px]">
-                    <button
-                      onClick={() => handleSyncRealAccount(acc.id, acc.name)}
-                      disabled={isSyncing}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 font-semibold cursor-pointer transition-all disabled:opacity-50"
-                      title="Sync live balance with verified transactions and banking records"
-                    >
-                      <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
-                      <span>{isSyncing ? 'Syncing...' : 'Sync Real Account'}</span>
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleSyncRealAccount(acc.id, acc.name)}
+                        disabled={isSyncing}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-50 dark:bg-cyan-950/50 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 font-semibold cursor-pointer transition-all disabled:opacity-50"
+                        title="Sync live balance with verified transactions and banking records"
+                      >
+                        <RefreshCw className={`h-3 w-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                        <span>{isSyncing ? 'Syncing...' : 'Sync'}</span>
+                      </button>
+
+                      {onOpenUpiPay && (
+                        <button
+                          onClick={onOpenUpiPay}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold shadow-xs cursor-pointer transition-all"
+                          title="Transfer money via Pinnacle CBS & NPCI Switch"
+                        >
+                          <Zap className="h-3 w-3 fill-slate-950" />
+                          <span>Transfer</span>
+                        </button>
+                      )}
+                    </div>
 
                     <button
                       onClick={() => handleReconcileAccount(acc.id)}

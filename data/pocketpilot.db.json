@@ -418,6 +418,35 @@
       "created_at": "2026-10-23T11:42:46.966Z",
       "updated_at": "2026-10-23T11:42:53.612Z",
       "security_seal": "b4701728e4a53090"
+    },
+    {
+      "id": "9d71b5e6-de6f-462e-b31e-19b69b6da4b5",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "name": "State Bank of India (Savings)",
+      "account_type": "SAVINGS",
+      "opening_balance": "50000.00",
+      "current_balance": "48000.00",
+      "currency": "INR",
+      "account_number": "•••• •••• 9104",
+      "account_number_encrypted": "v1:9d59c0dbc47bb6f38569d361:ba9b1ae922b03db3f67df0e03115d158:22751524b503513aa4e6c573",
+      "account_number_masked": "•••• •••• 9104",
+      "country": "IN",
+      "ifsc_code": "SBIN0000300",
+      "ifsc_code_encrypted": "v1:d3bf4ecd979d70be76e861a0:2dc7a9deaddf828d485ab372f98ab3c9:e76d9ddb487c4a030bcedc",
+      "branch_name": "Mumbai Fort Main (Horniman Circle)",
+      "institution": "State Bank of India",
+      "is_reconciled": true,
+      "last_reconciled_at": "2026-10-26T08:20:51.655Z",
+      "is_linked": true,
+      "linked_provider": "State Bank of India Direct Sync",
+      "last_synced_at": "2026-10-26T08:20:51.655Z",
+      "sync_status": "SYNCED",
+      "created_at": "2026-10-26T08:19:50.608Z",
+      "updated_at": "2026-10-26T08:21:01.105Z",
+      "upi_vpa": "divyaam@oksbi",
+      "upi_pin": "1234",
+      "is_primary_receiving": true,
+      "security_seal": "d14e5a93d271eb97"
     }
   ],
   "categories": [
@@ -684,6 +713,72 @@
       "is_reconciled": true,
       "created_at": "2026-10-23T11:42:46.966Z",
       "updated_at": "2026-10-23T11:42:46.966Z"
+    },
+    {
+      "id": "2f1e884d-c7fc-471c-bf13-0f105036c163",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "account_id": "9d71b5e6-de6f-462e-b31e-19b69b6da4b5",
+      "type": "INCOME",
+      "amount": "50000.00",
+      "transaction_date": "2026-10-26",
+      "payee": "State Bank of India Opening Balance Sync",
+      "notes": "Initial verified balance for account ending in 9104 (SBIN0000300)",
+      "is_reconciled": true,
+      "created_at": "2026-10-26T08:19:50.608Z",
+      "updated_at": "2026-10-26T08:19:50.608Z"
+    },
+    {
+      "id": "0c8b7f2c-d8cc-4bcc-81e8-897f9109c897",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "account_id": "9d71b5e6-de6f-462e-b31e-19b69b6da4b5",
+      "type": "EXPENSE",
+      "category_id": "cat-exp-6",
+      "classification": "WANT",
+      "payment_method": "UPI_QR",
+      "payee_identifier": "starbucks@paytm",
+      "amount": "1500.00",
+      "transaction_date": "2026-10-26",
+      "payee": "Starbucks Coffee",
+      "notes": "Coffee & Meeting • Paid from State Bank of India (Savings) via UPI (WANT) [NPCI RRN: 299608897653]",
+      "is_reconciled": true,
+      "npci_rrn": "299608897653",
+      "cbs_pinnacle_ref": "PINN-CBS-20261026-442A21",
+      "bank_switch_auth": "SW-AUTH-342008",
+      "transferree_legal_name": "Tata Starbucks Private Limited",
+      "transferree_vpa": "starbucks@paytm",
+      "transfer_fee": "0.00",
+      "transfer_fee_gst": "0.00",
+      "switch_route": "State Bank of India Switch ➔ Pinnacle CBS Host ➔ NPCI Central Switch ➔ Paytm Payments Bank Switch",
+      "legal_compliance_seal": "4CB1E374C2F64F454D7870BF7138C0C6",
+      "created_at": "2026-10-26T08:19:56.940Z",
+      "updated_at": "2026-10-26T08:19:56.940Z"
+    },
+    {
+      "id": "f9ca8866-4f07-4629-affa-fe8ee83ac78c",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "account_id": "9d71b5e6-de6f-462e-b31e-19b69b6da4b5",
+      "to_account_id": null,
+      "type": "EXPENSE",
+      "category_id": "cat-exp-6",
+      "classification": "WANT",
+      "payment_method": "UPI_CONTACT",
+      "payee_identifier": "rohan@okhdfcbank",
+      "amount": "500.00",
+      "transaction_date": "2026-10-26",
+      "payee": "Rohan Sharma",
+      "notes": "Lunch Share • Paid from State Bank of India (Savings) via UPI (WANT) [NPCI RRN: 299608349504]",
+      "is_reconciled": true,
+      "npci_rrn": "299608349504",
+      "cbs_pinnacle_ref": "PINN-CBS-20261026-1AF48F",
+      "bank_switch_auth": "SW-AUTH-296616",
+      "transferree_legal_name": "Rohan Sharma",
+      "transferree_vpa": "rohan@okhdfcbank",
+      "transfer_fee": "0.00",
+      "transfer_fee_gst": "0.00",
+      "switch_route": "State Bank of India Switch ➔ Pinnacle CBS Host ➔ NPCI Central Switch ➔ HDFC Bank Switch",
+      "legal_compliance_seal": "748D8F123A872513340D943074B5E62C",
+      "created_at": "2026-10-26T08:21:01.104Z",
+      "updated_at": "2026-10-26T08:21:01.104Z"
     }
   ],
   "monthly_budgets": [
@@ -1028,6 +1123,46 @@
       "action": "OTP_VERIFIED",
       "details": "User verified OTP for REGISTRATION",
       "timestamp": "2026-10-25T12:59:35.700Z"
+    },
+    {
+      "id": "0403fb3d-bac7-4cb0-91bd-fd56c73c0152",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "ACCOUNT_VAULT_ENCRYPTED",
+      "details": "Account State Bank of India (Savings) (State Bank of India) secured with AES-256-GCM and HMAC-SHA256 seal",
+      "timestamp": "2026-10-26T08:19:50.608Z"
+    },
+    {
+      "id": "5c97a2ee-0d96-417c-a57b-d5c1e3df19d2",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "UPI_SWITCH_PAYMENT_SUCCESS",
+      "details": "Cleared ₹1500.00 to Tata Starbucks Private Limited via Pinnacle CBS & NPCI Switch. RRN: 299608897653, CBS Ref: PINN-CBS-20261026-442A21, Fee: ₹0.00",
+      "timestamp": "2026-10-26T08:19:56.940Z"
+    },
+    {
+      "id": "c484726a-8f0e-43c5-9d39-9bd118380a65",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "REAL_ACCOUNT_SYNC",
+      "details": "Account State Bank of India (Savings) synced with real existing balance: INR 98500.00",
+      "timestamp": "2026-10-26T08:20:39.683Z"
+    },
+    {
+      "id": "2bbf194d-4e25-4b1e-9ca8-6e20c1d87a7c",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "REAL_ACCOUNT_SYNC",
+      "details": "Account State Bank of India (Savings) synced with real existing balance: INR 48500.00",
+      "timestamp": "2026-10-26T08:20:51.655Z"
+    },
+    {
+      "id": "b5cdaa55-be3d-4591-ad99-7e4561500cbc",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "UPI_SWITCH_PAYMENT_SUCCESS",
+      "details": "Cleared ₹500.00 to Rohan Sharma via Pinnacle CBS & NPCI Switch. RRN: 299608349504, CBS Ref: PINN-CBS-20261026-1AF48F, Fee: ₹0.00",
+      "timestamp": "2026-10-26T08:21:01.104Z"
     }
   ]
 }

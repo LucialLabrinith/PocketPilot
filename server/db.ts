@@ -353,6 +353,9 @@ class DatabaseStore {
     let balance = parseFloat(account.opening_balance || '0');
     const txs = this.state.transactions.filter(t => t.user_id === userId);
     for (const tx of txs) {
+      if (tx.notes?.includes('Initial verified balance') || tx.payee?.includes('Opening Balance Sync')) {
+        continue;
+      }
       const amt = parseFloat(tx.amount || '0');
       if (tx.type === 'INCOME' && tx.account_id === accountId) {
         balance += amt;

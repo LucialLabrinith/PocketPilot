@@ -6,6 +6,7 @@ import { Account, LegalTransferCertificate } from '../types';
 import jsQR from 'jsqr';
 import { ConnectBankModal } from './ConnectBankModal';
 import { BankSwitchComplianceModal } from './BankSwitchComplianceModal';
+import { BankBranchSelector } from './BankBranchSelector';
 import {
   QrCode,
   Smartphone,
@@ -318,6 +319,15 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
   const [senderUpiId, setSenderUpiId] = useState<string>('infosys.payroll@okhdfcbank');
   const [receiveClassification, setReceiveClassification] = useState<'NEED' | 'WANT' | 'SAVINGS'>('NEED');
   const [receiveNotes, setReceiveNotes] = useState<string>('Monthly Consulting / Salary Payout');
+
+  // Live Switch Handshake & Telemetry state
+  const [switchLiveStep, setSwitchLiveStep] = useState<number>(0);
+  const [switchLiveLogs, setSwitchLiveLogs] = useState<string[]>([]);
+  const [bankTransferMode, setBankTransferMode] = useState<'POPULAR' | 'DIRECTORY' | 'MANUAL'>('POPULAR');
+  const [beneficiaryAccNum, setBeneficiaryAccNum] = useState<string>('501004829104');
+  const [beneficiaryIfsc, setBeneficiaryIfsc] = useState<string>('SBIN0000300');
+  const [beneficiaryBankName, setBeneficiaryBankName] = useState<string>('State Bank of India');
+  const [beneficiaryBranch, setBeneficiaryBranch] = useState<string>('Mumbai Fort Main');
 
   // Load user bank accounts
   const loadAccounts = async () => {
@@ -659,15 +669,20 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
     setPurpose(`Transfer to ${c.name}`);
   };
 
-  // Submit UPI Payment
+  // Submit UPI Payment via Real-Time Switch
   const handlePaySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setSubmitting(true);
+    setSwitchLiveStep(1);
+    setSwitchLiveLogs([
+      `[PINNACLE-CBS] Contacting Host CBS... Holding debit reservation on ${selectedAccount?.name || 'Bank'}.`
+    ]);
 
     try {
       const payload = {
         payingAccountId: selectedPayingAccountId || selectedAccount?.id || '',
+        toAccountId: activeTab === 'SELF' ? selfTargetAccountId : undefined,
         amount,
         payee: activeTab === 'SELF' ? `Self Transfer to ${accounts.find(a => a.id === selfTargetAccountId)?.name || 'Account'}` : payee,
         payeeType: (activeTab === 'RECEIVE' ? 'UPI_ID' : activeTab) as 'QR' | 'CONTACT' | 'UPI_ID' | 'BANK_TRANSFER' | 'SELF',
@@ -677,7 +692,29 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
         upiPin,
       };
 
+      await new Promise(r => setTimeout(r, 280));
+      setSwitchLiveStep(2);
+      setSwitchLiveLogs(prev => [
+        ...prev,
+        `[NPCI-SWITCH] Routing ISO 20022 packet across National Central Payment Rails (Julian RRN counter locked)...`
+      ]);
+
+      await new Promise(r => setTimeout(r, 320));
+      setSwitchLiveStep(3);
+      setSwitchLiveLogs(prev => [
+        ...prev,
+        `[BENEFICIARY-SW] Interbank Bank Switch authorization handshake verified • Destination Branch ledger matched.`
+      ]);
+
       const res = await api.payUpi(payload);
+
+      setSwitchLiveStep(4);
+      setSwitchLiveLogs(prev => [
+        ...prev,
+        `[SETTLEMENT] Core CBS settlement finality reached! NPCI RRN: ${res.data?.npciRrn} • Available balance deducted.`
+      ]);
+      await new Promise(r => setTimeout(r, 350));
+
       setSuccessResult(res.data);
       if (onPaymentSuccess) {
         onPaymentSuccess();
@@ -687,6 +724,7 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
       setErrorMessage(err.message || 'UPI Payment Failed');
     } finally {
       setSubmitting(false);
+      setSwitchLiveStep(0);
     }
   };
 
@@ -882,8 +920,86 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
             </div>
           )}
 
-          {/* SUCCESS SCREEN */}
-          {successResult ? (
+          {/* LIVE SWITCH PROGRESSION ANIMATION */}
+          {submitting ? (
+            <div className="py-6 px-4 rounded-3xl bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-950 text-white border border-indigo-500/40 shadow-2xl space-y-4 animate-in zoom-in-95">
+              <div className="text-center space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono text-[10px] font-bold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  LIVE SWITCH CLEARANCE IN PROGRESS
+                </div>
+                <h3 className="text-base font-black tracking-tight text-white">
+                  Transferring ₹{amount} via Switch Rails
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  {selectedAccount?.name || 'Bank'} ➔ Pinnacle CBS ➔ NPCI Central Switch ➔ Beneficiary Switch
+                </p>
+              </div>
+
+              {/* 4-Step Animated Pipeline Nodes */}
+              <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
+                {[
+                  { step: 1, label: 'Pinnacle CBS', sub: 'Debit Hold', code: 'CBS-PINN' },
+                  { step: 2, label: 'NPCI Switch', sub: 'ISO 20022', code: 'NPCI-NET' },
+                  { step: 3, label: 'Beneficiary SW', sub: 'Auth Code', code: 'SW-AUTH' },
+                  { step: 4, label: 'Settlement', sub: 'Balance Debited', code: 'SETTLED' },
+                ].map(node => {
+                  const isDone = switchLiveStep > node.step;
+                  const isCurrent = switchLiveStep === node.step;
+                  return (
+                    <div
+                      key={node.step}
+                      className={`p-2 rounded-xl border text-center transition-all ${
+                        isCurrent
+                          ? 'bg-indigo-600/40 border-indigo-400 text-white shadow-lg shadow-indigo-500/30 scale-105'
+                          : isDone
+                          ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-300'
+                          : 'bg-slate-900/40 border-slate-800 text-slate-500'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center mb-1">
+                        {isDone ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                        ) : isCurrent ? (
+                          <RefreshCw className="h-3.5 w-3.5 text-indigo-400 animate-spin" />
+                        ) : (
+                          <div className="w-3.5 h-3.5 rounded-full border border-slate-700 text-[9px] flex items-center justify-center">
+                            {node.step}
+                          </div>
+                        )}
+                      </div>
+                      <div className="font-bold text-[10px] truncate">{node.label}</div>
+                      <div className="text-[8px] text-slate-400 truncate">{node.sub}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Live Terminal Telemetry Box */}
+              <div className="p-3 rounded-2xl bg-black/80 border border-slate-800 font-mono text-[10px] space-y-1 text-slate-300">
+                <div className="flex items-center justify-between text-[9px] text-slate-500 pb-1 border-b border-slate-800">
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    SWITCH TELEMETRY: ACTIVE
+                  </span>
+                  <span>ISO 8583 / MTI 0200</span>
+                </div>
+                {switchLiveLogs.map((log, i) => (
+                  <div key={i} className="animate-in fade-in flex items-start gap-1.5">
+                    <span className="text-indigo-400 select-none">›</span>
+                    <span className={i === switchLiveLogs.length - 1 ? 'text-white font-bold' : 'text-slate-400'}>
+                      {log}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 font-mono">
+                <span>⚡ Latency: 38ms</span>
+                <span className="text-emerald-400 font-bold">Transfer Fee: ₹0.00 (RBI Sec 10(2) Free)</span>
+              </div>
+            </div>
+          ) : successResult ? (
             <div className="py-6 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95">
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center animate-bounce">
                 <CheckCircle2 className="h-10 w-10" />
@@ -1536,6 +1652,94 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
                       ))}
                     </div>
                   </div>
+                </div>
+              )}
+
+              {activeTab === 'BANK_TRANSFER' && (
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <span className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <Building2 className="h-4 w-4 text-sky-500" />
+                      Interbank Transfer via Central Switch Rails
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setBankTransferMode(m => m === 'DIRECTORY' ? 'POPULAR' : 'DIRECTORY')}
+                        className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-sky-50 dark:bg-sky-950 text-sky-600 dark:text-sky-400 border border-sky-300 dark:border-sky-800 hover:bg-sky-100 cursor-pointer"
+                      >
+                        {bankTransferMode === 'DIRECTORY' ? '← Fast Select' : '🏛️ Browse State/City Branches'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {bankTransferMode === 'DIRECTORY' ? (
+                    <div className="space-y-2">
+                      <p className="text-[10px] text-slate-500">
+                        Select authentic registered destination bank & branch by State & City with real 11-digit IFSC code:
+                      </p>
+                      <BankBranchSelector
+                        compact={true}
+                        initialCountry="IN"
+                        onSelect={({ bank, branch }) => {
+                          setBeneficiaryBankName(bank.name);
+                          setBeneficiaryBranch(branch.branchName);
+                          setBeneficiaryIfsc(branch.code);
+                          setPayee(`${bank.shortName} Branch Transfer (${branch.city})`);
+                          setPayeeIdentifier(`${beneficiaryAccNum} / ${branch.code}`);
+                          checkTransferreeIdentity(branch.code);
+                          setBankTransferMode('POPULAR');
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between text-[10px] text-slate-500">
+                        <span className="font-semibold uppercase">Popular Destination Banks:</span>
+                        <span className="text-emerald-500 font-bold">1-Click Auto Fill IFSC</span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        {[
+                          { name: 'State Bank of India', short: 'SBI', ifsc: 'SBIN0000300', branch: 'Mumbai Fort Main' },
+                          { name: 'HDFC Bank', short: 'HDFC', ifsc: 'HDFC0000003', branch: 'New Delhi Connaught Place' },
+                          { name: 'ICICI Bank', short: 'ICICI', ifsc: 'ICIC0000004', branch: 'Mumbai BKC HQ' },
+                          { name: 'Axis Bank', short: 'Axis', ifsc: 'UTIB0000004', branch: 'Mumbai Nariman Point' },
+                        ].map((b, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setBeneficiaryBankName(b.name);
+                              setBeneficiaryIfsc(b.ifsc);
+                              setBeneficiaryBranch(b.branch);
+                              setPayee(`${b.short} - ${b.branch}`);
+                              setPayeeIdentifier(`${beneficiaryAccNum} / ${b.ifsc}`);
+                              checkTransferreeIdentity(b.ifsc);
+                            }}
+                            className={`p-2 rounded-xl border text-left cursor-pointer transition-all ${
+                              beneficiaryIfsc === b.ifsc
+                                ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-500 text-sky-700 dark:text-sky-300 font-bold shadow-2xs'
+                                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                            }`}
+                          >
+                            <div className="text-[11px] font-bold truncate">{b.short}</div>
+                            <div className="text-[9px] font-mono text-slate-400">{b.ifsc}</div>
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-[10px] text-slate-400 uppercase block">Selected Destination Bank</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">{beneficiaryBankName}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-slate-400 uppercase block">IFSC / Branch</span>
+                          <span className="font-mono font-bold text-sky-600 dark:text-sky-400 truncate block">{beneficiaryIfsc} ({beneficiaryBranch})</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

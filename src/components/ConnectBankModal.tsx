@@ -55,7 +55,7 @@ export const ConnectBankModal: React.FC<ConnectBankModalProps> = ({
   const [selectedBankId, setSelectedBankId] = useState('sbi');
   const [bankName, setBankName] = useState('State Bank of India (SBI)');
   const [accountType, setAccountType] = useState<'SAVINGS' | 'CHECKING'>('SAVINGS');
-  const [accountNumber, setAccountNumber] = useState('');
+  const [accountNumber, setAccountNumber] = useState('501004829104');
   const [ifscCode, setIfscCode] = useState('SBIN0000300');
   const [branchName, setBranchName] = useState('Mumbai Fort Main (Horniman Circle)');
   const [selectedBranchDetails, setSelectedBranchDetails] = useState<{
@@ -72,7 +72,7 @@ export const ConnectBankModal: React.FC<ConnectBankModalProps> = ({
     category: 'PUBLIC_SECTOR'
   });
 
-  const [balance, setBalance] = useState('0.00');
+  const [balance, setBalance] = useState('50000.00');
   const [upiVpa, setUpiVpa] = useState(`${userHandle}@oksbi`);
   const [upiPin, setUpiPin] = useState('1234');
 

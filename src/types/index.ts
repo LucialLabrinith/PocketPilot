@@ -251,6 +251,7 @@ export interface PocketMoneyState {
 
 export interface UpiPayRequest {
   payingAccountId: string;
+  toAccountId?: string;
   amount: string;
   payee: string;
   payeeType: 'QR' | 'CONTACT' | 'UPI_ID' | 'BANK_TRANSFER' | 'SELF';
