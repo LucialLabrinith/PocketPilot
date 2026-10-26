@@ -519,14 +519,23 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
     setCameraError(null);
     setScannedFeedback(null);
     try {
-      if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(t => t.stop());
-          streamRef.current = null;
-        }
-        let stream: MediaStream;
+      const nav = typeof navigator !== 'undefined' ? navigator : null;
+      if (!nav) {
+        throw new Error('Device environment not supported');
+      }
+
+      // Stop any existing stream tracks first
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop());
+        streamRef.current = null;
+      }
+
+      let stream: MediaStream | null = null;
+
+      if (nav.mediaDevices && nav.mediaDevices.getUserMedia) {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({
+          // Attempt 1: Ideal facingMode and 720p resolution
+          stream = await nav.mediaDevices.getUserMedia({
             video: {
               facingMode: { ideal: targetFacing },
               width: { ideal: 1280 },
@@ -535,30 +544,65 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
             audio: false,
           });
         } catch {
-          // Fallback to any available video stream
-          stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false,
+          try {
+            // Attempt 2: Simple facingMode constraint
+            stream = await nav.mediaDevices.getUserMedia({
+              video: { facingMode: targetFacing },
+              audio: false,
+            });
+          } catch {
+            // Attempt 3: General fallback for any available video device
+            stream = await nav.mediaDevices.getUserMedia({
+              video: true,
+              audio: false,
+            });
+          }
+        }
+      } else {
+        // Legacy vendor-prefixed getUserMedia fallback
+        const legacyGUM = (nav as any).getUserMedia || (nav as any).webkitGetUserMedia || (nav as any).mozGetUserMedia || (nav as any).msGetUserMedia;
+        if (legacyGUM) {
+          stream = await new Promise<MediaStream>((resolve, reject) => {
+            legacyGUM.call(nav, { video: true, audio: false }, resolve, reject);
           });
         }
-
-        streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.setAttribute('playsinline', 'true');
-          await videoRef.current.play().catch(() => {});
-        }
-        setIsCameraActive(true);
-        isScanningRef.current = true;
-        setScannedFeedback('📷 Viewfinder active • Align merchant QR or barcode in frame');
-        animationFrameRef.current = requestAnimationFrame(scanVideoFrame);
-      } else {
-        setCameraError('Camera API not accessible in this environment. You can upload a QR image or pick preset QRs below.');
       }
+
+      if (!stream) {
+        throw new Error('Could not initialize video stream from device camera.');
+      }
+
+      streamRef.current = stream;
+      setIsCameraActive(true);
+      isScanningRef.current = true;
+      setScannedFeedback('📷 Camera viewfinder active • Point at any QR code');
+
+      // Attach stream to video element
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.setAttribute('playsinline', 'true');
+        videoRef.current.setAttribute('webkit-playsinline', 'true');
+        videoRef.current.muted = true;
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          console.warn('Video play interrupted or awaiting user interaction:', playErr);
+        }
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      animationFrameRef.current = requestAnimationFrame(scanVideoFrame);
     } catch (err: any) {
-      const msg = err.name === 'NotAllowedError'
-        ? 'Camera permission denied. Please allow camera permissions in your browser or upload an image.'
-        : 'Could not access device camera. You can upload an image or choose a preset merchant below.';
+      console.warn('Camera access issue:', err);
+      const msg = err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
+        ? 'Camera permission denied. Please click the camera/lock icon in your browser address bar to allow camera access, or upload an image.'
+        : err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError'
+        ? 'No camera found on this device. You can upload any QR image or select from merchant presets below.'
+        : err.name === 'NotReadableError' || err.name === 'TrackStartError'
+        ? 'Camera is currently in use by another application. Please close other camera apps and retry.'
+        : err.message || 'Could not access device camera. Please check permissions or upload an image.';
       setCameraError(msg);
       setIsCameraActive(false);
       isScanningRef.current = false;
@@ -572,7 +616,9 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
       animationFrameRef.current = null;
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
+      try {
+        streamRef.current.getTracks().forEach(t => t.stop());
+      } catch {}
       streamRef.current = null;
     }
     if (videoRef.current) {
@@ -596,6 +642,39 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
     isScanningRef.current = true;
     animationFrameRef.current = requestAnimationFrame(scanVideoFrame);
   };
+
+  // Synchronize stream with video element whenever isCameraActive changes
+  useEffect(() => {
+    if (isCameraActive && videoRef.current && streamRef.current) {
+      if (videoRef.current.srcObject !== streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+      }
+      videoRef.current.play().catch(() => {});
+    }
+  }, [isCameraActive]);
+
+  // Automatically activate camera when QR scanner tab is opened
+  useEffect(() => {
+    let active = true;
+    if (isOpen && activeTab === 'QR') {
+      const timer = setTimeout(() => {
+        if (active) {
+          startCamera();
+        }
+      }, 60);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+        stopCamera();
+      };
+    } else {
+      stopCamera();
+    }
+    return () => {
+      active = false;
+      stopCamera();
+    };
+  }, [isOpen, activeTab]);
 
   const handleFileUploadQr = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1368,16 +1447,31 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
                   {/* LIVE CAMERA & QR SCANNER VIEWFINDER */}
                   <div className="relative rounded-2xl bg-slate-950 border-2 border-emerald-500/40 overflow-hidden text-white p-3 shadow-inner">
                     {/* Viewfinder box with animated scan laser */}
-                    <div className="relative h-44 sm:h-52 w-full rounded-xl overflow-hidden bg-slate-900 flex flex-col items-center justify-center border border-slate-800">
-                      {isCameraActive ? (
-                        <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                          muted
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      ) : (
+                    <div className="relative h-48 sm:h-56 w-full rounded-xl overflow-hidden bg-slate-900 flex flex-col items-center justify-center border border-slate-800 shadow-inner">
+                      {/* Persistent video element - always mounted so ref and stream attachment never fail */}
+                      <video
+                        ref={(el) => {
+                          videoRef.current = el;
+                          if (el && streamRef.current && el.srcObject !== streamRef.current) {
+                            el.srcObject = streamRef.current;
+                            el.play().catch(() => {});
+                          }
+                        }}
+                        autoPlay
+                        playsInline
+                        muted
+                        onLoadedMetadata={() => {
+                          if (videoRef.current) {
+                            videoRef.current.play().catch(() => {});
+                          }
+                        }}
+                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${
+                          isCameraActive ? 'opacity-100 z-0' : 'opacity-0 pointer-events-none -z-10'
+                        }`}
+                      />
+
+                      {/* Offline / Inactive Placeholder Overlay */}
+                      {!isCameraActive && (
                         <div className="flex flex-col items-center text-center p-4 space-y-2 z-10">
                           <div className="p-3 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 animate-pulse">
                             <Scan className="h-8 w-8" />
@@ -1386,22 +1480,32 @@ export const UpiPayModal: React.FC<UpiPayModalProps> = ({
                           <div className="text-[10px] text-slate-400 max-w-xs">
                             Point device camera at any Google Pay, PhonePe, Paytm, BharatPe QR, or merchant barcode
                           </div>
+                          <button
+                            type="button"
+                            onClick={() => startCamera()}
+                            className="mt-1 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow cursor-pointer flex items-center gap-1.5 active:scale-95 transition-transform"
+                          >
+                            <Camera className="h-3.5 w-3.5" />
+                            <span>Start Device Camera</span>
+                          </button>
                         </div>
                       )}
 
                       {/* Viewfinder Reticle Corners */}
-                      <div className="absolute inset-3 pointer-events-none border-2 border-dashed border-emerald-400/60 rounded-xl flex flex-col justify-between p-2">
-                        <div className="flex justify-between">
-                          <div className="w-4 h-4 border-t-2 border-l-2 border-emerald-400"></div>
-                          <div className="w-4 h-4 border-t-2 border-r-2 border-emerald-400"></div>
+                      {isCameraActive && (
+                        <div className="absolute inset-3 pointer-events-none border-2 border-dashed border-emerald-400/60 rounded-xl flex flex-col justify-between p-2 z-10">
+                          <div className="flex justify-between">
+                            <div className="w-4 h-4 border-t-2 border-l-2 border-emerald-400"></div>
+                            <div className="w-4 h-4 border-t-2 border-r-2 border-emerald-400"></div>
+                          </div>
+                          {/* Animated Laser Scanning Line */}
+                          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-bounce"></div>
+                          <div className="flex justify-between">
+                            <div className="w-4 h-4 border-b-2 border-l-2 border-emerald-400"></div>
+                            <div className="w-4 h-4 border-b-2 border-r-2 border-emerald-400"></div>
+                          </div>
                         </div>
-                        {/* Animated Laser Scanning Line */}
-                        <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-bounce"></div>
-                        <div className="flex justify-between">
-                          <div className="w-4 h-4 border-b-2 border-l-2 border-emerald-400"></div>
-                          <div className="w-4 h-4 border-b-2 border-r-2 border-emerald-400"></div>
-                        </div>
-                      </div>
+                      )}
 
                       {/* Camera Permission or Hardware Error */}
                       {cameraError && (

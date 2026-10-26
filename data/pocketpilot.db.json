@@ -23,12 +23,12 @@
     {
       "id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
       "email": "divyaam2008@gmail.com",
-      "password_hash": "dae53354cb7b85d102dfe38616002467d6b18a94caf7452ae68a5620ffa47cb2",
+      "password_hash": "5cb378efd457ab4d20622432896135b5feb4a8cbcf9dd3296052492190500006",
       "full_name": "Divyaam P",
       "currency": "INR",
       "is_verified": true,
       "created_at": "2026-10-22T15:10:03.919Z",
-      "updated_at": "2026-10-25T07:33:00.219Z"
+      "updated_at": "2026-10-26T09:10:18.131Z"
     },
     {
       "id": "0b13aecf-3a0d-402d-a510-138f087fc98e",
@@ -345,6 +345,34 @@
       "client_type": "WEB",
       "created_at": "2026-10-25T12:59:35.700Z",
       "expires_at": "2026-11-01T12:59:35.700Z"
+    },
+    {
+      "token": "pp_9b749f6815aa40eb96b82dc00061825c",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-26T09:03:15.555Z",
+      "expires_at": "2026-11-02T09:03:15.556Z"
+    },
+    {
+      "token": "pp_cd74bc92c63849be9cec83314d5eb849",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-26T09:10:00.432Z",
+      "expires_at": "2026-11-02T09:10:00.432Z"
+    },
+    {
+      "token": "pp_bdc51ec168604bb3b6eb497526ede12f",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-26T09:10:18.133Z",
+      "expires_at": "2026-11-02T09:10:18.133Z"
+    },
+    {
+      "token": "pp_a0b22bd8982e42e985ed18513973588c",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "created_at": "2026-10-26T14:26:35.509Z",
+      "expires_at": "2026-11-02T14:26:35.509Z"
     }
   ],
   "accounts": [
@@ -425,7 +453,7 @@
       "name": "State Bank of India (Savings)",
       "account_type": "SAVINGS",
       "opening_balance": "50000.00",
-      "current_balance": "48000.00",
+      "current_balance": "47500.00",
       "currency": "INR",
       "account_number": "•••• •••• 9104",
       "account_number_encrypted": "v1:9d59c0dbc47bb6f38569d361:ba9b1ae922b03db3f67df0e03115d158:22751524b503513aa4e6c573",
@@ -442,11 +470,11 @@
       "last_synced_at": "2026-10-26T08:20:51.655Z",
       "sync_status": "SYNCED",
       "created_at": "2026-10-26T08:19:50.608Z",
-      "updated_at": "2026-10-26T08:21:01.105Z",
+      "updated_at": "2026-10-26T14:26:55.199Z",
       "upi_vpa": "divyaam@oksbi",
       "upi_pin": "1234",
       "is_primary_receiving": true,
-      "security_seal": "d14e5a93d271eb97"
+      "security_seal": "ae719f4f4e6395fc"
     }
   ],
   "categories": [
@@ -779,6 +807,33 @@
       "legal_compliance_seal": "748D8F123A872513340D943074B5E62C",
       "created_at": "2026-10-26T08:21:01.104Z",
       "updated_at": "2026-10-26T08:21:01.104Z"
+    },
+    {
+      "id": "4e496351-2c15-4a44-b7ae-7c896273d4d1",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "account_id": "9d71b5e6-de6f-462e-b31e-19b69b6da4b5",
+      "to_account_id": null,
+      "type": "EXPENSE",
+      "category_id": "cat-exp-1",
+      "classification": "NEED",
+      "payment_method": "UPI_QR",
+      "payee_identifier": "bharatpetroleum@icici",
+      "amount": "500.00",
+      "transaction_date": "2026-10-26",
+      "payee": "Bharat Petroleum Fuel Station",
+      "notes": "Petrol Refuel • Paid from State Bank of India (Savings) via UPI (NEED) [NPCI RRN: 299614981444]",
+      "is_reconciled": true,
+      "npci_rrn": "299614981444",
+      "cbs_pinnacle_ref": "PINN-CBS-20261026-1F1EC3",
+      "bank_switch_auth": "SW-AUTH-491604",
+      "transferree_legal_name": "Bharatpetroleum",
+      "transferree_vpa": "bharatpetroleum@icici",
+      "transfer_fee": "0.00",
+      "transfer_fee_gst": "0.00",
+      "switch_route": "State Bank of India Switch ➔ Pinnacle CBS Host ➔ NPCI Central Switch ➔ ICICI Bank Switch",
+      "legal_compliance_seal": "AD665A576F664C79B9A1C040A8984A28",
+      "created_at": "2026-10-26T14:26:55.198Z",
+      "updated_at": "2026-10-26T14:26:55.198Z"
     }
   ],
   "monthly_budgets": [
@@ -1163,6 +1218,46 @@
       "action": "UPI_SWITCH_PAYMENT_SUCCESS",
       "details": "Cleared ₹500.00 to Rohan Sharma via Pinnacle CBS & NPCI Switch. RRN: 299608349504, CBS Ref: PINN-CBS-20261026-1AF48F, Fee: ₹0.00",
       "timestamp": "2026-10-26T08:21:01.104Z"
+    },
+    {
+      "id": "1a77e581-f665-4d21-bd87-f3d9e67a91cc",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam2008@gmail.com",
+      "timestamp": "2026-10-26T09:03:15.555Z"
+    },
+    {
+      "id": "bbe081ff-09a5-47e6-9c56-7136905586ab",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN_GOOGLE",
+      "details": "User signed in with verified Google account: divyaam2008@gmail.com",
+      "timestamp": "2026-10-26T09:10:00.432Z"
+    },
+    {
+      "id": "08e042a1-1903-4eae-a15f-de7ed2ddbba8",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN",
+      "details": "User logged in successfully with database password",
+      "timestamp": "2026-10-26T09:10:18.133Z"
+    },
+    {
+      "id": "4a24f423-33d1-42a4-85a5-51d187e4a3a1",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "LOGIN",
+      "details": "User logged in successfully with database password",
+      "timestamp": "2026-10-26T14:26:35.509Z"
+    },
+    {
+      "id": "3a77ce48-b50c-46ae-a44a-38e7fcc11d34",
+      "user_id": "a3be5014-b5bb-4ccc-b7a2-45923ee95d67",
+      "client_type": "WEB",
+      "action": "UPI_SWITCH_PAYMENT_SUCCESS",
+      "details": "Cleared ₹500.00 to Bharatpetroleum via Pinnacle CBS & NPCI Switch. RRN: 299614981444, CBS Ref: PINN-CBS-20261026-1F1EC3, Fee: ₹0.00",
+      "timestamp": "2026-10-26T14:26:55.198Z"
     }
   ]
 }
